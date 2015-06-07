@@ -63,7 +63,9 @@ class ConnectionSPARQL
 		}
 		sparqlURL=baseURL+"?#{querypart}"
 		response = Net::HTTP.get_response(URI.parse(sparqlURL))
-		return CSV::parse(response.body)
+
+		data = CSV::parse(response.body)
+		return data
 	end
 
 end

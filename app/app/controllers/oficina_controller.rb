@@ -5,39 +5,64 @@ require 'ConnectionSPARQL'
 
 class OficinaController < ApplicationController
 
+respond_to :html, :json, :js
+
 	def index
-		dsn="http://laburb.com"
-		prefix1="PREFIX dc: <http://purl.org/dc/elements/1.1/>"
-		prefix2="PREFIX bibo: <http://purl.org/ontology/bibo/>"
 		query="
-			SELECT DISTINCT ?name ?person ?id
-			FROM <#{dsn}>
+			SELECT Distinct ?nameArticle ?year ?nodeAuthor ?nodeAuthor2 ?name
+			FROM <http://laburb.com>
 			WHERE {
-				?person bibo:identifier ?id .
-				?person dc:title ?name
-			}"
+			    ?article a bibo:AcademicArticle .
+			    ?article dcterms:issued ?year .
+			    ?article dc:title ?nameArticle .
+			    ?article vivo:relatedBy ?nodeAuthor.
+			    ?nodeAuthor vivo:relates ?nodeAuthor2.
+			    ?nodeAuthor2 rdfs:label ?name.
+			    FILTER (!langMatches(lang(?nameArticle), \"en\")).
+			    FILTER regex(str(?name), \"Glauco\")
+
+			} order by ?nameArticle"
 		c=ConnectionSPARQL.new
-		@data1= c.runQuery(query)
-		#@data1 = c.teste
+		data = c.runQuery(query)
+
+
+		#data = data.force_encoding("UTF-8")
+		#logger.info data
+
+		@triples = csvToArray(data)
+		#logger.info @triples
+		respond_with(@triples)
 	end
 
-	def sparqlQuery(query, baseURL, format="text/csv")
-		params={
-			"default-graph" => "",
-			"should-sponge" => "soft",
-			"query" => query,
-			"debug" => "on",
-			"timeout" => "",
-			"format" => format,
-			"save" => "display",
-			"fname" => ""
-		}
-		querypart=""
-		params.each { |k,v|
-			querypart+="#{k}=#{CGI.escape(v)}&"
-		}
-		sparqlURL=baseURL+"?#{querypart}"
-		response = Net::HTTP.get_response(URI.parse(sparqlURL))
-		return CSV::parse(response.body)
+#######################################################
+# Transforma os dados vindos do vituoso do formato CSV para um Array com Hash
+# --> Entrada: Array em CSV
+# --> Saida: Array
+#######################################################
+	def csvToArray (data)
+		line = Hash.new
+		triples = Array.new
+		cont = false
+		data.each do |row|
+			if cont == false
+				row.pop
+				cont = true
+			else
+
+				line["nameArticle"] = row[0]
+				line["year"] = row[1]
+				line["nodeAuthor"] = row[2]
+				line["nodeAuthor2"] = row[3]
+				line["name"] = row[4]
+				logger.info line
+				triples.push(line)
+			end
+		end
+
+		triples.each do |row|
+			logger.info row
+		end
+
+		return triples
 	end
 end
