@@ -19,9 +19,9 @@ respond_to :html, :json, :js
 			    ?nodeAuthor vivo:relates ?nodeAuthor2.
 			    ?nodeAuthor2 rdfs:label ?name.
 			    FILTER (!langMatches(lang(?nameArticle), \"en\")).
-			    FILTER regex(str(?name), \"Glauco\")
+			    FILTER regex(str(?name), \"Andr\")
 
-			} order by ?nameArticle"
+			} order by ?year"
 		c=ConnectionSPARQL.new
 		data = c.runQuery(query)
 
@@ -40,7 +40,7 @@ respond_to :html, :json, :js
 # --> Saida: Array
 #######################################################
 	def csvToArray (data)
-		line = Hash.new
+
 		triples = Array.new
 		cont = false
 		data.each do |row|
@@ -48,21 +48,15 @@ respond_to :html, :json, :js
 				row.pop
 				cont = true
 			else
-
+				line = Hash.new
 				line["nameArticle"] = row[0]
 				line["year"] = row[1]
 				line["nodeAuthor"] = row[2]
 				line["nodeAuthor2"] = row[3]
 				line["name"] = row[4]
-				logger.info line
 				triples.push(line)
 			end
 		end
-
-		triples.each do |row|
-			logger.info row
-		end
-
 		return triples
 	end
 end
