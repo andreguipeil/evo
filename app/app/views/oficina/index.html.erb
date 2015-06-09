@@ -1,23 +1,29 @@
 <%= app_header %>
 
 <div class="container">
+
+<div>
+    <%=  %>
+
+</div>
+
 <div class="table-responsive">
 <table id="table_main" class="table table-striped">
 <tr >
-    <th id='column1'>nameArticle</th>
-    <th>year</th>
-    <th>nodeAuthor</th>
-    <th>nodeAuthor2</th>
-    <th>name</th>
+    <th id='column1'>a</th>
+    <th>b</th>
+    <th>c</th>
+    <th>d</th>
+    <th>e</th>
 </tr>
     <% @triples.each do |row| %>
     <tr>
-            <td><%= row["nameArticle"] %></td>
+            <td><%  %></td>
 
             <td><%= row["year"] %></td>
-            <td><%= row["nodeAuthor"] %></td>
-            <td><%= row["nodeAuthor2"] %></td>
-            <td><%= row["name"] %></td>
+            <td><%= row["article"] %></td>
+            <td><%= row["nameArticle"]%></td>
+            <td><%  %></td>
     </tr>
     <% end %>
 </table>

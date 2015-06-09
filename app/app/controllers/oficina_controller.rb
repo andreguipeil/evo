@@ -3,25 +3,23 @@ require 'cgi'
 require 'csv'
 require 'ConnectionSPARQL'
 
+
 class OficinaController < ApplicationController
+
 
 respond_to :html, :json, :js
 
+
 	def index
 		query="
-			SELECT Distinct ?nameArticle ?year ?nodeAuthor ?nodeAuthor2 ?name
-			FROM <http://laburb.com>
+			SELECT ?article ?year ?nameArticle
+			FROM <http://gaci.edu.br>
 			WHERE {
 			    ?article a bibo:AcademicArticle .
 			    ?article dcterms:issued ?year .
 			    ?article dc:title ?nameArticle .
-			    ?article vivo:relatedBy ?nodeAuthor.
-			    ?nodeAuthor vivo:relates ?nodeAuthor2.
-			    ?nodeAuthor2 rdfs:label ?name.
 			    FILTER (!langMatches(lang(?nameArticle), \"en\")).
-			    FILTER regex(str(?name), \"Andr\")
-
-			} order by ?year"
+			}"
 		c=ConnectionSPARQL.new
 		data = c.runQuery(query)
 
@@ -49,13 +47,14 @@ respond_to :html, :json, :js
 				cont = true
 			else
 				line = Hash.new
-				line["nameArticle"] = row[0]
+				line["article"] = row[0]
 				line["year"] = row[1]
-				line["nodeAuthor"] = row[2]
-				line["nodeAuthor2"] = row[3]
-				line["name"] = row[4]
+				str = row[2].encode("ASCII-8BIT").force_encoding("utf-8")
+				line["nameArticle"] = str
+				logger.info str
 				triples.push(line)
 			end
+
 		end
 		return triples
 	end
