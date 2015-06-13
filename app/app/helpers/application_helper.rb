@@ -3,9 +3,20 @@ module ApplicationHelper
 	def app_header
 
 		ret = "
-			<div class=\"jumbotron\">
+			<div id=\" header_evo \" class=\"jumbotron\">
 				<div class=\"container\">
-				   <h1> " + image_tag("logo_evo_small.png", :alt => "Evoluir") + " EVO</h1>
+				   <div class=\"row \">
+				   	<div class=\"col-xs-2 col-md-2\">
+				   		"+image_tag("logo_evo_small.png", :alt => "Evoluir")+"
+				   	</div>
+					<div class=\"col-xs-2 col-md-2 \">
+				   		<h1 id=\"evo-tittle\"> EVO </h1>
+				   	</div>
+
+
+				   </div>
+
+
 				</div>
 			</div>"
 

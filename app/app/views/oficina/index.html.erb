@@ -2,32 +2,8 @@
 
 <div class="container">
 
-<div>
-    <%=  %>
+<%= table_generate @ret["article"], @ret["cont"] %>
 
-</div>
-
-<div class="table-responsive">
-<table id="table_main" class="table table-striped">
-<tr >
-    <th id='column1'>a</th>
-    <th>b</th>
-    <th>c</th>
-    <th>d</th>
-    <th>e</th>
-</tr>
-    <% @triples.each do |row| %>
-    <tr>
-            <td><%  %></td>
-
-            <td><%= row["year"] %></td>
-            <td><%= row["article"] %></td>
-            <td><%= row["nameArticle"]%></td>
-            <td><%  %></td>
-    </tr>
-    <% end %>
-</table>
-</div>
 </div>
 
 <%= app_footer %>

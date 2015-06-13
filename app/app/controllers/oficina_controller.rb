@@ -2,6 +2,11 @@ require 'net/http'
 require 'cgi'
 require 'csv'
 require 'ConnectionSPARQL'
+require 'rubygems'
+require 'rubygems'
+require 'active_support/all'
+$KCODE = 'UTF8'
+
 
 
 class OficinaController < ApplicationController
@@ -10,26 +15,57 @@ class OficinaController < ApplicationController
 respond_to :html, :json, :js
 
 
+
+
 	def index
 		query="
-			SELECT ?article ?year ?nameArticle
+			SELECT distinct ?refBy ?id ?nameArticle
 			FROM <http://gaci.edu.br>
-			WHERE {
-			    ?article a bibo:AcademicArticle .
-			    ?article dcterms:issued ?year .
-			    ?article dc:title ?nameArticle .
-			    FILTER (!langMatches(lang(?nameArticle), \"en\")).
-			}"
+			WHERE{
+			   ?article a bibo:AcademicArticle .
+			   ?article dc:title ?nameArticle .
+			   ?article dcterms:isReferencedBy ?refBy .
+			   ?article vivo:relatedBy ?nodeAuthor.
+			   ?article dcterms:issued ?year .
+			   ?nodeAuthor vivo:relates ?nodeAuthor2.
+			   ?nodeAuthor vivo:rank ?rank .
+			   ?nodeAuthor2 rdfs:label ?name .
+			   ?refBy dc:creator ?personCreator.
+			   ?personCreator rdfs:label ?nome.
+			   ?article bibo:presentedAt ?conference.
+			   ?conference dc:title ?nameConference .
+                           ?refBy bibo:identifier ?id.
+                                  FILTER (!regex(str(?nodeAuthor2), concat(\"#author-\",str(?id))))
+			} ORDER BY ?refBy"
 		c=ConnectionSPARQL.new
 		data = c.runQuery(query)
 
-
+		#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\")
 		#data = data.force_encoding("UTF-8")
 		#logger.info data
+		first, *rest = query.split(/FROM/)
+		cont = first.scan("?").count
+		triples = csvToArray2(data, cont)
+ 		@ret = Hash.new
+ 		#@ret["triples"] = @triples
+ 		#@ret["cont"] = cont
+ 		@ret["article"] = contArticle(triples)
+		@ret["cont"] = 2
+		respond_with(@ret)
+	end
+#######################################################
+# Conta quantos artigos iguais existe no array
+# --> Entrada: array of hashes
+# --> Saida: object
+#######################################################
+	def contArticle (triples)
+		article = Hash.new(0)
+		triples.each do |row|
+			article[row[2]] +=1
+		end
 
-		@triples = csvToArray(data)
-		#logger.info @triples
-		respond_with(@triples)
+
+		return article.sort_by {|article,cont| cont}.reverse
 	end
 
 #######################################################
@@ -37,8 +73,8 @@ respond_to :html, :json, :js
 # --> Entrada: Array em CSV
 # --> Saida: Array
 #######################################################
-	def csvToArray (data)
-
+	def csvToArray2 (data, contFields)
+		i = 0;
 		triples = Array.new
 		cont = false
 		data.each do |row|
@@ -47,15 +83,22 @@ respond_to :html, :json, :js
 				cont = true
 			else
 				line = Hash.new
-				line["article"] = row[0]
-				line["year"] = row[1]
-				str = row[2].encode("ASCII-8BIT").force_encoding("utf-8")
-				line["nameArticle"] = str
-				logger.info str
+				while i < contFields do
+   					line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
+   					i += 1
+   				end
 				triples.push(line)
+				i = 0
 			end
-
 		end
-		return triples
+	return triples
 	end
+
+
+
+
+
+
+
+
 end
