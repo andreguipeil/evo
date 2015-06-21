@@ -52,8 +52,8 @@ respond_to :html, :json, :js
  		@ret = Hash.new
  		#@ret["triples"] = @triples
  		#@ret["cont"] = cont
- 		@ret["article"] = contArticle(triples)
-		@ret["cont"] = 2
+ 		@ret["article"] = triples
+		@ret["cont"] = cont
 		respond_with(@ret)
 	end
 #######################################################
@@ -66,8 +66,6 @@ respond_to :html, :json, :js
 		triples.each do |row|
 			article[row[2]] +=1
 		end
-
-
 		return article.sort_by {|article,cont| cont}.reverse
 	end
 
@@ -88,8 +86,10 @@ respond_to :html, :json, :js
 				line = Hash.new
 				while i < contFields do
    					line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
+
    					i += 1
    				end
+   				line[5] = retireConectives(line[5])
 				triples.push(line)
 				i = 0
 			end
@@ -102,53 +102,68 @@ respond_to :html, :json, :js
 # --> Entrada: string
 # --> Saida: string
 #######################################################
-	def retireConetives (article)
-		article.sub('a', '')
-		article.sub('as', '')
-		article.sub('às', '')
-		article.sub('ás', '')
-		article.sub('aos', '')
-		article.sub('com', '')
-		article.sub('como', '')
-		article.sub('cada', '')
-		article.sub('da', '')
-		article.sub('de', '')
-		article.sub('do', '')
-		article.sub('das', '')
-		article.sub('dos', '')
-		article.sub('e', '')
-		article.sub('é', '')
-		article.sub('este', '')
-		article.sub('esta', '')
-		article.sub('em', '')
-		article.sub('faz', '')
-		article.sub('fez', '')
-		article.sub('foi', '')
-		article.sub('fui', '')
-		article.sub('isto', '')
-		article.sub('mesmo', '')
-		article.sub('nós', '')
-		article.sub('não', '')
+	def retireConectives (article)
+			article = article.gsub('-a-', '-')
+			article = article.gsub('-as-', '-')
+			article = article.gsub('-aos-', '-')
+			article = article.gsub('-com-', '-')
+			article = article.gsub('-como-', '-')
+			article = article.gsub('-cada-', '-')
+			article = article.gsub('-da-', '-')
+			article = article.gsub('-de-', '-')
+			article = article.gsub('-do-', '-')
+			article = article.gsub('-das-', '-')
+			article = article.gsub('-dos-', '-')
+			article = article.gsub('-e-', '-')
+			article = article.gsub('-este-', '-')
+			article = article.gsub('-esta-', '-')
+			article = article.gsub('-em-', '-')
+			article = article.gsub('-faz-', '-')
+			article = article.gsub('-fez-', '-')
+			article = article.gsub('-foi-', '-')
+			article = article.gsub('-fui-', '-')
+			article = article.gsub('-isto-', '-')
+			article = article.gsub('-isso-', '-')
+			article = article.gsub('-mesmo-', '-')
+			article = article.gsub('-nao-', '-')
+			article = article.gsub('-no-', '-')
+			article = article.gsub('-nos-', '-')
+			article = article.gsub('-na-', '-')
+			article = article.gsub('-nas-', '-')
+			article = article.gsub('-nem-', '-')
+			article = article.gsub('-ha-', '-')
+			article = article.gsub('-ja-', '-')
+			article = article.gsub('-mas-', '-')
+			article = article.gsub('-muito-', '-')
+			article = article.gsub('-muitos-', '-')
+			article = article.gsub('-mais-', '-')
+			article = article.gsub('-ou-', '-')
+			article = article.gsub('-uma-', '-')
+			article = article.gsub('-um-', '-')
+			article = article.gsub('-uns-', '-')
+			article = article.gsub('-sao-', '-')
+			article = article.gsub('-os-', '-')
+			article = article.gsub('-o-', '-')
+			article = article.gsub('-se-', '-')
+			article = article.gsub('-so-', '-')
+			article = article.gsub('-sua-', '-')
+			article = article.gsub('-seus-', '-')
+			article = article.gsub('-seu-', '-')
 
-		article.sub('há', '')
-		article.sub('já', '')
-		article.sub('ja', '')
+			if  article[0].chr == 'a' and article[1].chr == '-'
+				article = article.gsub("a-", '')
+			end
+			if article[0].chr == 'o' and article[1].chr == '-'
+				article = article.gsub("o-", '')
+			end
 
-		article.sub('mas', '')
-		article.sub('muito', '')
-		article.sub('muitos', '')
-		article.sub('mais', '')
-
-		article.sub('ou', '')
-		article.sub('uma', '')
-		article.sub('um', '')
-		article.sub('sao', '')
-
-		article.sub('os', '')
-		article.sub('se', '')
-		article.sub('so', '')
-		article.sub('sua', '')
-
+			if article[0].chr == 'o' and article[1].chr == 's' and article[2].chr == '-'
+				article = article.gsub("os-", '')
+			end
+			if article[0].chr == 'a' and article[1].chr == 's' and article[2].chr == '-'
+				article = article.gsub("as-", '')
+			end
+		return article
 	end
 
 end
