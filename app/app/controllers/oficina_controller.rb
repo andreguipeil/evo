@@ -16,7 +16,7 @@ respond_to :html, :json, :js
 
 	def index
 		query="
-			SELECT DISTINCT  ?refBy ?nameReal ?nameRight (xsd:integer(?rank)) as ?rank ?article ?nameArticle ?nameConference
+			SELECT DISTINCT  ?refBy ?article (xsd:integer(?rank)) as ?rank ?nameReal ?nameRight ?nameArticle ?nameConference ?year
 				FROM <http://laburb.com>
 				WHERE{
 				 ?article a bibo:AcademicArticle .
@@ -49,6 +49,8 @@ respond_to :html, :json, :js
 		first, *rest = query.split(/FROM/)
 		cont = first.scan("?").count-1
 		triples = csvToArray2(data, cont)
+		setCoAuthors = setCoAuthors(triples)
+
  		@ret = Hash.new
  		#@ret["triples"] = @triples
  		#@ret["cont"] = cont
@@ -64,9 +66,57 @@ respond_to :html, :json, :js
 	def contArticle (triples)
 		article = Hash.new(0)
 		triples.each do |row|
-			article[row[2]] +=1
+			article[row[5]] +=1
+
 		end
 		return article.sort_by {|article,cont| cont}.reverse
+	end
+
+#######################################################
+# organiza os co-autores por refBy
+# --> Entrada: array of hashes
+# --> Saida: object
+#######################################################
+	def setCoAuthors (triples)
+
+		profiles = Array.new
+		triples.each do |row|
+			if !profiles.find { |h| h["refBy"] == row[0]} then
+				hashProfile = Hash.new
+				hashProfile["name"] = row[3]
+				hashProfile["refBy"] = row[0]
+				profiles.push(hashProfile)
+			end
+
+		end
+
+		articles = Array.new
+		triples.each do |row|
+			if !articles.find { |h| h["refByArticle"] == row[1]} then
+				hashArticle = Hash.new
+				hashArticle["refBy"] = row[0]
+				hashArticle["refByArticle"] = row[1]
+				hashArticle["article"] = row[5]
+				hashArticle["conference"] = row[6]
+				hashArticle["year"] = row[7]
+				articles.push(hashArticle)
+			end
+		end
+		logger.info articles
+
+
+		coAuthors = Array.new
+		triples.each do |row|
+			if !coAuthors.find { |h| h["coAuthor"] == row[1]} then
+				hashCoAuthors = Hash.new
+				hashCoAuthors["refBy"] = row[0]
+				hashCoAuthors["refByArticle"] = row[1]
+				hashCoAuthors["coAuthor"] = row[4]
+				hashCoAuthors["rank"] = row[2]
+				coAuthors.push(hashCoAuthors)
+			end
+		end
+		logger.info coAuthors
 	end
 
 #######################################################
@@ -85,11 +135,20 @@ respond_to :html, :json, :js
 			else
 				line = Hash.new
 				while i < contFields do
-   					line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
-
+   					line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8")
    					i += 1
    				end
+   				# collumn 3 = nome do rdf
+   				line[3] = line[3].parameterize.to_s
+   				# collumn 4 = nome do co-author
+   				line[4] = line[4].parameterize.to_s
+   				# collumn 5 = nome do artigo
+				line[5] = line[5].parameterize.to_s
    				line[5] = retireConectives(line[5])
+   				# collumn 6 = nome do congresso
+   				line[6] = line[6].parameterize.to_s
+   				line[6] = retireConectives(line[6])
+
 				triples.push(line)
 				i = 0
 			end
