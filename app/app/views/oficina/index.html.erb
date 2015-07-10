@@ -2,10 +2,22 @@
 
 <div class="container">
 
-<%= table_generate @ret["article"], @ret["cont"] %>
+	<div class="btn btn-lg btn-success" onclick="rodar()"> Rodar </div>
+
+
+
 
 </div>
 
 <%= app_footer %>
 
-</div>
+
+<script>
+
+function rodar(){
+
+	console.log("<%= @ret["article"] %>");
+
+}
+
+</script>

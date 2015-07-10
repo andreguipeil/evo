@@ -1,6 +1,7 @@
 module OficinaHelper
 
 	def table_generate(content, collumn)
+
 		ret = "
 				<div class=\"table-responsive\">
 				<table id=\"table_main\" class=\"table table-striped\">
@@ -16,7 +17,7 @@ module OficinaHelper
 				content.each do |row|
 					ret += "<tr>"
 					collumn.times{
-						ret += "<td>#{row[cont]} </td>"
+						ret += "<td>#{row[cont]}</td>"
 						cont += 1
 					}
 					cont = 0
@@ -24,7 +25,7 @@ module OficinaHelper
 				 end
 			ret += "</table>
 				</div>"
-		   ret.html_safe
+		 ret.html_safe
 	end
 
 

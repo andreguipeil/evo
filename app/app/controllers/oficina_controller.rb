@@ -5,14 +5,15 @@ require 'ConnectionSPARQL'
 require 'rubygems'
 require 'rubygems'
 require 'active_support/all'
+require "thread"
 $KCODE = 'UTF8'
 
 
 
 class OficinaController < ApplicationController
 
-
 respond_to :html, :json, :js
+
 
 	def index
 		query="
@@ -37,27 +38,73 @@ respond_to :html, :json, :js
 				 ?personCreator obo:ARG_2000028 ?nodeName .
 				 ?nodeName vcard:hasName ?nameName .
 				 ?nameName vcard:fn ?nameReal .
+
 				 FILTER (!regex(str(?nodeAuthor2), concat(\"#author-\",str(?id)))).
 				 FILTER (str(?nameReal) = str(?nameWrong))
 			} ORDER BY ?refBy ?nameArticle ?rank"
+
+#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\") .
 		c=ConnectionSPARQL.new
 		data = c.runQuery(query)
 
 		#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\")
 		#data = data.force_encoding("UTF-8")
 		#logger.info data
-		first, *rest = query.split(/FROM/)
-		cont = first.scan("?").count-1
-		triples = csvToArray2(data, cont)
-		setCoAuthors = setCoAuthors(triples)
+
+
+		first, *rest = query.split(/FROM/) 		# pega os campos dinamicamente
+		cont = first.scan("?").count-1 			# faz a contagem do campos
+		@triples = csvToArray(data, cont)		# transforma de csv para array para facilitar a manipulacao
+		createEntities(@triples)
+
+		#coAuthors = organizeCoAuthors(triples)		#
+
+	 	#distance = distanceEdition(coAuthors)
+
 
  		@ret = Hash.new
- 		#@ret["triples"] = @triples
- 		#@ret["cont"] = cont
- 		@ret["article"] = triples
-		@ret["cont"] = cont
+ 		@ret["triples"] = @triples
+ 		@ret["cont"] = cont
+ 		@ret["article"] = @triples
+		#@ret["cont"] = 5
+
+		#logger.info @ret
 		respond_with(@ret)
 	end
+
+	def createEntities (triples)
+
+		sideA 	= triples.dup
+		sideB 	= triples.dup
+		entities = Array.new
+		temp 	= Array.new
+
+		sideA.each do |a|
+			logger.info sideB.size
+			if(sideB.size > 0) then
+				entity 	  = Array.new
+				newSide = Array.new
+
+					sideB.each do |b|
+						distance = Levenshtein.normalized_distance(a[5],b[5])
+						if distance <= 0.2 || distance == 0.0 then
+							arr = b
+							entity.push(arr)
+						else
+							newSide.push(b)
+						end
+					end
+
+				entities.push(entity)
+				sideB = newSide
+			end
+		end
+		logger.info entities
+
+	end
+
+
+
 #######################################################
 # Conta quantos artigos iguais existe no array
 # --> Entrada: array of hashes
@@ -67,17 +114,49 @@ respond_to :html, :json, :js
 		article = Hash.new(0)
 		triples.each do |row|
 			article[row[5]] +=1
-
 		end
 		return article.sort_by {|article,cont| cont}.reverse
 	end
+
+
+#######################################################
+#Distancia de Edicao
+# --> Entrada: array of hashes
+# --> Saida: object
+#######################################################
+
+	def distanceEdition (coAuthors)
+		distanceEdition = Array.new
+		Thread.new {
+			coAuthors.each do |row1|
+				Thread.new {
+					coAuthors.each do |row2|
+
+						distance = Levenshtein.normalized_distance(row1[2], row2[2])
+						if distance < 0.5 && distance != 0.0 then
+							line = Hash.new
+							line[0] = row1[2]
+							line[1] = row1[1]
+							line[2] = row2[1]
+							line[3] = row2[2]
+							line[4] = distance
+							distanceEdition.push(line)
+						end
+					end
+				}
+		end
+		}
+		return distanceEdition
+	end
+
+
 
 #######################################################
 # organiza os co-autores por refBy
 # --> Entrada: array of hashes
 # --> Saida: object
 #######################################################
-	def setCoAuthors (triples)
+	def organizeCoAuthors (triples)
 
 		profiles = Array.new
 		triples.each do |row|
@@ -109,22 +188,23 @@ respond_to :html, :json, :js
 		triples.each do |row|
 			if !coAuthors.find { |h| h["coAuthor"] == row[1]} then
 				hashCoAuthors = Hash.new
-				hashCoAuthors["refBy"] = row[0]
-				hashCoAuthors["refByArticle"] = row[1]
-				hashCoAuthors["coAuthor"] = row[4]
-				hashCoAuthors["rank"] = row[2]
+				hashCoAuthors[0] = row[0]
+				hashCoAuthors[1] = row[1]
+				hashCoAuthors[2] = row[4]
+				hashCoAuthors[3] = row[2]
 				coAuthors.push(hashCoAuthors)
 			end
 		end
-		logger.info coAuthors
+		return coAuthors
 	end
 
 #######################################################
 # Transforma os dados vindos do vituoso do formato CSV para um Array com Hash
+# Já parametrizado conforme o esperado
 # --> Entrada: Array em CSV
 # --> Saida: Array
 #######################################################
-	def csvToArray2 (data, contFields)
+	def csvToArray (data, contFields)
 		i = 0;
 		triples = Array.new
 		cont = false
@@ -140,8 +220,10 @@ respond_to :html, :json, :js
    				end
    				# collumn 3 = nome do rdf
    				line[3] = line[3].parameterize.to_s
+   				line[3] = retireConectivesNames(line[3])
    				# collumn 4 = nome do co-author
    				line[4] = line[4].parameterize.to_s
+   				line[4] = retireConectivesNames(line[4])
    				# collumn 5 = nome do artigo
 				line[5] = line[5].parameterize.to_s
    				line[5] = retireConectives(line[5])
@@ -153,7 +235,7 @@ respond_to :html, :json, :js
 				i = 0
 			end
 		end
-	return triples
+		return triples
 	end
 
 #######################################################
@@ -223,6 +305,29 @@ respond_to :html, :json, :js
 				article = article.gsub("as-", '')
 			end
 		return article
+	end
+
+#######################################################
+# retira todos os conectivos(stopwords) do nome da pessoa
+# --> Entrada: string
+# --> Saida: string
+#######################################################
+	def retireConectivesNames (name)
+			name = name.gsub('-da-', '-')
+			name = name.gsub('-de-', '-')
+			name = name.gsub('-di-', '-')
+			name = name.gsub('-do-', '-')
+			name = name.gsub('-das-', '-')
+			name = name.gsub('-dos-', '-')
+			name = name.gsub('-e-', '-')
+			name = name.gsub('-na-', '-')
+			name = name.gsub('-nos-', '-')
+			name = name.gsub('-van-', '-')
+			name = name.gsub('-von-', '-')
+			name = name.gsub('-y-', '-')
+			name = name.gsub('-del-', '-')
+
+		return name
 	end
 
 end
