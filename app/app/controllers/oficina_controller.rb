@@ -6,6 +6,7 @@ require 'rubygems'
 require 'rubygems'
 require 'active_support/all'
 require "thread"
+require "json"
 $KCODE = 'UTF8'
 
 
@@ -43,7 +44,7 @@ respond_to :html, :json, :js
 				 FILTER (str(?nameReal) = str(?nameWrong))
 			} ORDER BY ?refBy ?nameArticle ?rank"
 
-#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\") .
+		#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\") .
 		c=ConnectionSPARQL.new
 		data = c.runQuery(query)
 
@@ -55,8 +56,12 @@ respond_to :html, :json, :js
 		first, *rest = query.split(/FROM/) 		# pega os campos dinamicamente
 		cont = first.scan("?").count-1 			# faz a contagem do campos
 		@triples = csvToArray(data, cont)		# transforma de csv para array para facilitar a manipulacao
-		createEntities(@triples)
 
+
+		createArq(createEntities(@triples))
+		#createCSVFile(createEntities(@triples))
+		#readArq
+		readArqJSON
 		#coAuthors = organizeCoAuthors(triples)		#
 
 	 	#distance = distanceEdition(coAuthors)
@@ -70,6 +75,63 @@ respond_to :html, :json, :js
 
 		#logger.info @ret
 		respond_with(@ret)
+	end
+
+
+
+	def createArq (entities)
+		File.open('laburb3.txt', 'w') do |f2|
+ 			entities.each do | ent |
+ 				ent.each do | t |
+ 					f2.puts t
+ 				end
+ 				f2.puts "\n"
+ 			end
+ 		end
+	end
+
+	def readArq
+		entities = Array.new
+		entity =  Array.new
+		IO.readlines('laburb2.txt').each do | line |
+			if (line != "\n")
+				if(line != ";")
+					logger.info line
+					hash = Hash.new
+					hash = line
+					entity.push(hash)
+				end
+				logger.info entity
+			else
+				entities.push(entity)
+				entity.clear
+			end
+		end
+		logger.info entities
+	end
+
+	def readArqJSON
+		entities = Array.new
+		entity =  Array.new
+		IO.readlines('laburb2.txt').each do | line |
+			if (line != "\n")
+				if(line != ";")
+		#			logger.info line
+					hash = eval(line)
+					entity.push(hash)
+				end
+		#		logger.info entity
+			else
+				e = entity.dup
+				entities.push(e)
+				entity.clear
+			end
+		end
+		#logger.info entities
+
+	a = entities[0][0]
+	logger.info a[5]
+
 	end
 
 	def createEntities (triples)
@@ -99,7 +161,7 @@ respond_to :html, :json, :js
 				sideB = newSide
 			end
 		end
-		logger.info entities
+		return entities
 
 	end
 
