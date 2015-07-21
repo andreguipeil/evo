@@ -17,6 +17,10 @@ respond_to :html, :json, :js
 
 
 	def index
+
+		# =========
+		# STEP 1 - importing RDF data information
+		# =========
 		query="
 			SELECT DISTINCT  ?refBy ?article (xsd:integer(?rank)) as ?rank ?nameReal ?nameRight ?nameArticle ?nameConference ?year
 				FROM <http://laburb.com>
@@ -44,27 +48,35 @@ respond_to :html, :json, :js
 				 FILTER (str(?nameReal) = str(?nameWrong))
 			} ORDER BY ?refBy ?nameArticle ?rank"
 
-		#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\") .
-		c=ConnectionSPARQL.new
+		c = ConnectionSPARQL.new
 		data = c.runQuery(query)
 
-		#FILTER regex(lcase(str(?nameArticle)), \"peoplegrid\")
-		#data = data.force_encoding("UTF-8")
-		#logger.info data
-
+		# =========
+		# STEP 2 - normalization of names and articles
+		# =========
 
 		first, *rest = query.split(/FROM/) 		# pega os campos dinamicamente
 		cont = first.scan("?").count-1 			# faz a contagem do campos
 		@triples = csvToArray(data, cont)		# transforma de csv para array para facilitar a manipulacao
 
+		# =========
+		# STEP 3 - create similar articles block's
+		# =========
 
-		createArq(createEntities(@triples))
-		#createCSVFile(createEntities(@triples))
+		#semanticBlock = createEntities(@triples)
+
+		# =========
+		# STEP 4 - load info quickly
+		# =========
+
+		#createArq(semanticBlock)
 		#readArq
-		readArqJSON
-		#coAuthors = organizeCoAuthors(triples)		#
+		entities = readArq("laburb3.txt")
 
-	 	#distance = distanceEdition(coAuthors)
+		# =========
+		# STEP 5 - Desambiguation
+		# =========
+		desambiguation (entities)
 
 
  		@ret = Hash.new
@@ -78,8 +90,85 @@ respond_to :html, :json, :js
 	end
 
 
+#######################################################
+# La desambiguacion
+# --> Entrada: array of entities
+# --> Saida: object
+#######################################################
 
-	def createArq (entities)
+	def desambiguation (entities)
+		entityA = entities[22].dup
+		entityB = entities[22].dup
+
+		sames = Array.new
+
+
+		entityA.each do | a |
+			if(entityB.size > 0) then
+				newEntity = Array.new
+				entityB.each do | b |
+					if(a[0] != b[0]) then
+						distance = Levenshtein.normalized_distance(a[4],b[4])
+						if distance <= 0.5 || distance == 0.0 then
+							logger.info "======================="
+							logger.info a
+							logger.info b
+
+							vd = 0
+							# name article == name article
+							if(a[5] == b[5]) then
+								vd += 2
+							end
+							# rank == rank
+							if (a[2] == b[2]) then
+								vd += 2
+							end
+							# conference == conference
+							if (a[6] == b[6]) then
+								vd += 3
+							end
+							# year == year
+							if(a[7] == b[7]) then
+								vd += 1
+							end
+							# value_desambiguation is greater than 3
+							if(vd > 3) then
+								same = Hash.new
+								same[0] = a
+								same[1] = b
+								same[2] = vd
+								sames.push(same)
+							end
+							logger.info "value desambiguation: #{vd}"
+							logger.info "======================="
+						else
+							newEntity.push(b)
+						end
+					else
+						newEntity.push(b)
+					end
+				end
+				entityB = newEntity
+			end
+		end
+
+		logger.info "===================================="
+		logger.info "LOG DE DESAMBIGUAÇÃO"
+		logger.info "===================================="
+
+		sames.each do |same|
+			logger.info same[0][4] +" do RDF "+ same[0][0] +" == "+ same[1][4] +" do RDF "+ same[1][0]
+		end
+	end
+
+
+#######################################################
+# Cria um arquivo representando a blocagem dos artigos
+# --> Entrada: array of articles, name file
+# --> Saida: object
+#######################################################
+
+	def createArq (entities, arq)
 		File.open('laburb3.txt', 'w') do |f2|
  			entities.each do | ent |
  				ent.each do | t |
@@ -90,49 +179,43 @@ respond_to :html, :json, :js
  		end
 	end
 
-	def readArq
-		entities = Array.new
-		entity =  Array.new
-		IO.readlines('laburb2.txt').each do | line |
-			if (line != "\n")
-				if(line != ";")
-					logger.info line
-					hash = Hash.new
-					hash = line
-					entity.push(hash)
-				end
-				logger.info entity
-			else
-				entities.push(entity)
-				entity.clear
-			end
-		end
-		logger.info entities
-	end
+#######################################################
+# Lê arquivo contendo os blocos de artigos
+# --> Entrada: nome do arquivo
+# --> Saida: array de entidades
+#######################################################
 
-	def readArqJSON
+
+	def readArq (arq)
 		entities = Array.new
 		entity =  Array.new
-		IO.readlines('laburb2.txt').each do | line |
+		IO.readlines(arq).each do | line |
 			if (line != "\n")
-				if(line != ";")
-		#			logger.info line
-					hash = eval(line)
-					entity.push(hash)
-				end
+		#		logger.info line
+				hash = eval(line)
+				entity.push(hash)
 		#		logger.info entity
 			else
-				e = entity.dup
-				entities.push(e)
-				entity.clear
+				if (entity.size > 0) then
+					e = entity.dup
+					entities.push(e)
+					entity.clear
+				end
 			end
 		end
 		#logger.info entities
 
-	a = entities[0][0]
-	logger.info a[5]
-
+		#entities[0].each do |a|
+		#	logger.info a
+		#end
+		return entities
 	end
+
+#######################################################
+# Cria blocagem de aritgos
+# --> Entrada: array of triples
+# --> Saida: array of articles
+#######################################################
 
 	def createEntities (triples)
 
@@ -162,7 +245,6 @@ respond_to :html, :json, :js
 			end
 		end
 		return entities
-
 	end
 
 
