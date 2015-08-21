@@ -1,5 +1,30 @@
 #evo-tittle {
-    margin-top: 50px;
-    margin-left: -75px;
-    font-family: 'Exo', 200;
+	font-family: 'Exo', 200;
+}
+#logo {
+	width: 48px;
+
+}
+
+#div-logo{
+	margin-top:-20px;
+
+}
+
+#div-desc{
+
+    margin-top: -25px;
+    margin-left: 40px;
+
+}
+
+.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+	background-color: #EC0F17;
+
+}
+
+#id {
+
+    width: 80px;
+    text-align: center;
 }

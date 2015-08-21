@@ -1,27 +1,164 @@
-<%= app_header %>
+
+
+<nav class="navbar navbar-default">
+	<div class="container">
+		<div class="navbar-header">
+			<a id="evo-tittle" class="navbar-brand" href="#">
+				<div id="div-logo">
+					<%= image_tag("logo_evo_small.png", :alt => "Evoluir", :id => "logo") %>
+				</div>
+				<div id="div-desc">
+					EVO
+				</div>
+			</a>
+		</div>
+		<div id="navbar">
+			<ul class="nav navbar-nav">
+				<li class="active"><%= link_to "Home", '', :method => :get %></li>
+				<li><%= link_to "About", 'oficina#about', :method => :get %></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a onclick="teste()">Link</a></li>
+				<li><a href="#">Link</a></li>
+				<li><a href="#">Link</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
 
 <div class="container">
 
-	<!-- <div class="btn btn-lg btn-success" onclick="rodar()"> Rodar </div> -->
+	<div class="container">
 
+		<table id="listGraphos" class="table table-striped table-hover">
+		      		<caption><h1>Lista de Grafos Disponíveis</h1></caption>
+			      	<thead>
+			        		<tr>
+			          			<th id="id">#</th>
+			          			<th>Grafo</th>
+			        		</tr>
+			      	</thead>
+			      	<tbody>
+			        		<tr id='1'>
+			          			<th id="id" scope="row">1</th>
+			          			<td>http://ufpel.edu.br</td>
+			        		</tr>
+			        		<tr id='2'>
+			          			<th id="id" scope="row">2</th>
+			          			<td>http://laropa.com</td>
+			        		</tr>
+			        		<tr id='3'>
+			          			<th id="id" scope="row">3</th>
+			          			<td>http://laburb.com</td>
+			        		</tr>
 
-<div id="results" class="row">
+			        		<tr id='4'>
+			          			<th id="id" scope="row">4</th>
+			          			<td>http://peil.com</td>
+			        		</tr>
+				</tbody>
+		</table>
 
-</div>
+		<hr>
+
+		<form id='form_des' style='width:600px;'>
+	  		<div class="form-group">
+	    			<label for="label-graph">Grafo</label>
+	    			<input type="text" class="form-control" id="graph" placeholder="Digite o grafo em que deseja aplicar a desambiguação. Ex: http://lattes.edu.br">
+	  		</div>
+	  		<div class="form-group">
+	    			<label for="">Nivel de Desambiguação</label>
+	    			<select class="form-control" id="vd" style='width:300px;'>
+	    				<option>Selecione o nível de desambiguação</option>
+					<option>1</option>
+				  	<option>2</option>
+				  	<option>3</option>
+				  	<option>4</option>
+				  	<option>5</option>
+				  	<option>6</option>
+				  	<option>7</option>
+				  	<option>8</option>
+				  	<option>9</option>
+				  	<option>10</option>
+				</select>
+	    		</div>
+	    		<p class="help-block">Para desambiguar basta clicar, lembrando que este processo pode demorar um pouco.</p>
+		</form>
+		<button  class="btn btn-success" onclick="sendForm()">Desambiguar</button>
+	</div>
+
+	<div id="results" class="row">
+
+	</div>
 
 </div>
 
 <%= app_footer %>
 
+<div  id="aviso" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="aviso_titulo">Modal title</h4>
+			</div>
+			<div class="modal-body" style="margin-top: 10px;margin-bottom: 10px;padding-top: 10px;padding-bottom: 40px">
+				<div class="col-lg-1">
+					<i id="icone" class="fa fa-info-circle fa-3x"></i>
+				</div>
+				<div class="col-lg-11" style="margin-top: 10px">
+					<p id="aviso_mensagem"> One fine body&hellip;</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="aviso_botao" type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Certo</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div>
+
+
 
 <script>
 
-function rodar(){
+	var rows = document.getElementById("listGraphos").rows;
+	if (rows != 0) {
+	    	for (var i = 0; i < rows.length; i++) {
+	        		rows[i].onclick = function() {
+	            			if(this != ''){
+	            				document.getElementById("graph").value = $(this).closest('tr').children('td').text();
+	            			}
+	        		};
+	    	}
+	}
 
 
-	console.log("here!");
-
-
-}
+	function sendForm(){
+		if($("#graph").val() == ''){
+			console.log("aqui");
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu um <b>grafo.</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		} else {
+			if($("#vd").val().length > 2){
+            				$('#aviso_titulo').html('Campos incompletos');
+				$('#aviso_mensagem').html('Você não escolheu um <b>Nivel de desambiguação.</b>.');
+		 		$('#aviso').modal('show');
+				return 0;
+            			} else {
+            				$.ajax({
+					url: '/oficina/desambiguar',
+					dataType: 'json',
+					data: {'graph' : $("#graph").val(),
+					           'vd' : $("#vd").val()},
+					success : function($data) {
+			            		},
+			            		error: function(xhr, ajaxOptions, thrownError) {
+					}
+				});
+            			}
+		}
+	}
 
 </script>

@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
 
-	match 'oficina' => 'oficina#index', via: 'get'
-
 	# The priority is based upon order of creation: first created -> highest priority.
 	# See how all your routes lay out with "rake routes".
 
@@ -9,7 +7,7 @@ Rails.application.routes.draw do
 	 root  'oficina#index'
 
 	# Example of regular route:
-	#   get 'products/:id' => 'catalog#view'
+   	get 'oficina', :to => 'oficina#about'
 
 	# Example of named route that can be invoked with purchase_url(id: product.id)
 	#   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
@@ -17,12 +15,6 @@ Rails.application.routes.draw do
 	# Example resource route (maps HTTP verbs to controller actions automatically):
 	#   resources :products
 
-	# Example resource route with options:
-	#   resources :products do
-	#     member do
-	#       get 'short'
-	#       post 'toggle'
-	#     end
 	#
 	#     collection do
 	#       get 'sold'
@@ -30,10 +22,11 @@ Rails.application.routes.draw do
 	#   end
 
 	# Example resource route with sub-resources:
-	#   resources :products do
-	#     resources :comments, :sales
-	#     resource :seller
-	#   end
+	resources :oficina do
+	     collection do
+	     	get 'desambiguar'
+	     end
+	end
 
 	# Example resource route with more complex sub-resources:
 	#   resources :products do

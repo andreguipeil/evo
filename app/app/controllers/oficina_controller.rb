@@ -31,12 +31,12 @@ respond_to :html, :json, :js
 		# STEP 1 - importing RDF data information
 		# =========
 		#query = Query.new
-		#q1 = query.selectCoauthors("http://laburb.com")
-		#q2 = query.selectAuthors("http://laburb.com")
+		#q1 = query.selectCoauthors("http://laropa.com")
+		#q2 = query.selectAuthors("http://laropa.com")
 
 		#c = ConnectionSPARQL.new
 		#data = c.runQuery(q1["query"])		# recebe os dados vindos do virtuoso coauthores
-	       	#data2 = c.runQuery(q2["query"])	# recebe os dados vindos do virtuoso authores
+	       	#data2 = c.runQuery(q2["query"])		# recebe os dados vindos do virtuoso authores
 
 		# =========
 		# STEP 2 - normalization of names and articles
@@ -59,15 +59,15 @@ respond_to :html, :json, :js
 		# =========
 		# STEP 4 - load info quickly
 		# =========
-		arq = FileArray.new
-		arq.createArq(semanticBlock, "laburb.txt")		# cria arquivo e insere os blocos semanticos
-		entitiesTemp = arq.readArq("laburb.txt")		# carrega os blocos semanticos
+		#arq = FileArray.new
+		#arq.createArq(semanticBlock, "laropa.txt")		# cria arquivo e insere os blocos semanticos
+		#entitiesTemp = arq.readArq("laropa.txt")		# carrega os blocos semanticos
 
 		# =========
 		# STEP 5 - Desambiguation
 		# =========
-		des = Desambiguation.new
-		des.desambiguationEntities(entitiesTemp)
+		#des = Desambiguation.new
+		#des.desambiguationEntities(entitiesTemp)
 
 
  		#@ret = Hash.new
@@ -80,4 +80,25 @@ respond_to :html, :json, :js
 		respond_with(@ret)
 	end
 
+
+	def desambiguar
+		graph = params[:graph]
+		vd = params[:vd]
+
+		# =========
+		# STEP 4 - load info quickly
+		# =========
+		arq = FileArray.new
+		#arq.createArq(semanticBlock, "laropa.txt")		# cria arquivo e insere os blocos semanticos
+		entitiesTemp = arq.readArq(graph)		# carrega os blocos semanticos
+
+		# =========
+		# STEP 5 - Desambiguation
+		# =========
+		des = Desambiguation.new
+		des.desambiguationEntities(entitiesTemp)
+
+
+		respond_with(@ret)
+	end
 end

@@ -28,7 +28,11 @@ class Desambiguation
 								vd = 0
 								# name article == name article
 								if(a[5] == b[5]) then
-									vd += 2
+									vd += 3
+								else
+									if distance <= 0.2 || distance == 0.0 then
+										vd += 2
+									end
 								end
 								# rank == rank
 								if (a[2] == b[2]) then
@@ -48,6 +52,18 @@ class Desambiguation
 									same[0] = a
 									same[1] = b
 									same[2] = vd
+									#troca de idp para o id verdadeiro
+									if(a[8].include? 'idp')
+										if(!b[8].include? 'idp')
+											a[8] = b[8]
+											a[4] = b[4]
+										end
+									else
+										if(b[8].include? 'idp')
+											b[8] = a[8]
+											b[4] = a[4]
+										end
+									end
 									sames.push(same)
 								end
 								Rails.logger.info "value desambiguation: #{vd}"
@@ -64,11 +80,30 @@ class Desambiguation
 			end
 
 			Rails.logger.info "===================================="
-			Rails.logger.info "LOG DE DESAMBIGUAÇÃO"
+			Rails.logger.info "LOG DE DISAMBIGUATION"
 			Rails.logger.info "===================================="
 
 			sames.each do |same|
-				Rails.logger.info same[0][4] +" do RDF "+ same[0][0] +" -"+ same[0][3]  +" == "+ same[1][4] +" do RDF "+ same[1][0] +" -"+ same[1][3]
+				Rails.logger.info "COAUTHOR 1 ====== COAUTHOR 2"
+				Rails.logger.info same[0][4] +" <==> "+ same[1][4]
+				Rails.logger.info
+				Rails.logger.info "COMPARSIONS"
+				Rails.logger.info "["+same[0][0] +"] == ["+same[1][0]+"]"
+				Rails.logger.info "-----"
+				Rails.logger.info same[0][5] +" <==> "+ same[1][5]
+				Rails.logger.info same[0][2] +" <==> "+ same[1][2]
+				Rails.logger.info same[0][6] +" <==> "+ same[1][6]
+				Rails.logger.info same[0][7] +" <==> "+ same[1][7]
+				Rails.logger.info "-----"
+				Rails.logger.info "ID CHANGE"
+				Rails.logger.info same[0][8] +" <==> "+ same[1][8]
+				Rails.logger.info "+++"
+				Rails.logger.info "[VD] value disambiguation: " + same[2].to_s
+				Rails.logger.info " "
+				Rails.logger.info "============"
+				Rails.logger.info "========"
+				Rails.logger.info "==="
+			#	Rails.logger.info same[0][4] +" do RDF "+ same[0][0] +" - "+ same[0][3]  +" -- "+ same[0][8]+" == "+ same[1][4] +" do RDF "+ same[1][0] +" - "+ same[1][3] + " -- "+ same[1][8]
 			end
 			entitySames.push(sames)
 		end
