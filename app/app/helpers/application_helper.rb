@@ -27,6 +27,7 @@ module ApplicationHelper
 	def app_footer
 
 		ret = "
+			<hr>
 			    <footer class=\"footer\">
 			      <div class=\"container\">
 			        <p class=\"text-muted text-center\">Desenvolvido por André Peil</p>

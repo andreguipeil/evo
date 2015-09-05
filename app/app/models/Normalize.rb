@@ -34,8 +34,9 @@ class Normalize
    				line[6] = line[6].parameterize.to_s
    				line[6] = retireConectives(line[6])
    				# collumn 8 = referencia do author
+
    				Rails.logger.info line[8]
-   				line[8] = line[8].split("-").last
+   				line[8] = line[8].split("lattes").last
 				Rails.logger.info line[8]
 				triples.push(line)
 				i = 0

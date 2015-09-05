@@ -82,6 +82,71 @@
 				  	<option>10</option>
 				</select>
 	    		</div>
+	    		<hr>
+	    		<div class="form-group">
+	    			<label for="">Peso do Artigo</label>
+	    			<select class="form-control" id="nameArticle" style='width:300px;'>
+	    				<option>Selecione o peso</option>
+					<option>1</option>
+				  	<option>2</option>
+				  	<option>3</option>
+				  	<option>4</option>
+				  	<option>5</option>
+				  	<option>6</option>
+				  	<option>7</option>
+				  	<option>8</option>
+				  	<option>9</option>
+				  	<option>10</option>
+				</select>
+	    		</div>
+	    		<div class="form-group">
+	    			<label for="">Peso do Rank</label>
+	    			<select class="form-control" id="rank" style='width:300px;'>
+	    				<option>Selecione o peso</option>
+					<option>1</option>
+				  	<option>2</option>
+				  	<option>3</option>
+				  	<option>4</option>
+				  	<option>5</option>
+				  	<option>6</option>
+				  	<option>7</option>
+				  	<option>8</option>
+				  	<option>9</option>
+				  	<option>10</option>
+				</select>
+	    		</div>
+	    		<div class="form-group">
+	    			<label for="">Peso da Conferencia</label>
+	    			<select class="form-control" id="conference" style='width:300px;'>
+	    				<option>Selecione o peso</option>
+					<option>1</option>
+				  	<option>2</option>
+				  	<option>3</option>
+				  	<option>4</option>
+				  	<option>5</option>
+				  	<option>6</option>
+				  	<option>7</option>
+				  	<option>8</option>
+				  	<option>9</option>
+				  	<option>10</option>
+				</select>
+	    		</div>
+	    		<div class="form-group">
+	    			<label for="">Peso do Year</label>
+	    			<select class="form-control" id="year" style='width:300px;'>
+	    				<option>Selecione o peso</option>
+					<option>1</option>
+				  	<option>2</option>
+				  	<option>3</option>
+				  	<option>4</option>
+				  	<option>5</option>
+				  	<option>6</option>
+				  	<option>7</option>
+				  	<option>8</option>
+				  	<option>9</option>
+				  	<option>10</option>
+				</select>
+	    		</div>
 	    		<p class="help-block">Para desambiguar basta clicar, lembrando que este processo pode demorar um pouco.</p>
 		</form>
 		<button  class="btn btn-success" onclick="sendForm()">Desambiguar</button>
@@ -150,8 +215,14 @@
             				$.ajax({
 					url: '/oficina/desambiguar',
 					dataType: 'json',
-					data: {'graph' : $("#graph").val(),
-					           'vd' : $("#vd").val()},
+					data: {
+						'graph' : $("#graph").val(),
+					           	'vd' : $("#vd").val(),
+					           	'nameArticle': $("#nameArticle").val(),
+					           	'rank': $("#rank").val(),
+					           	'conference': $("#conference").val(),
+					           	'year': $("#year").val(),
+					           },
 					success : function($data) {
 			            		},
 			            		error: function(xhr, ajaxOptions, thrownError) {

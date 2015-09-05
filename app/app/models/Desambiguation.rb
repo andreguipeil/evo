@@ -1,3 +1,11 @@
+require 'rdf'
+require 'linkeddata'
+require 'rdf/ntriples'
+require 'rdf/nquads'
+require 'set'
+
+
+
 class Desambiguation
 
 #######################################################
@@ -6,7 +14,13 @@ class Desambiguation
 # --> Saida: array of desambiguation [element a, element b, value_desambiguation]
 #######################################################
 
-	def desambiguationEntities (entities)
+	def desambiguationEntities (entities, values)
+		valueNA 	= values['nameArticle'].to_i;
+		valueR 		= values['rank'].to_i;
+		valueConf 	= values['conference'].to_i;
+		valueY 		= values['year'].to_i;
+		Rails.logger.info values
+
 		entitiesTemp = entities.dup
 		entitySames = Array.new
 		entitiesTemp.each do | ent |
@@ -28,23 +42,23 @@ class Desambiguation
 								vd = 0
 								# name article == name article
 								if(a[5] == b[5]) then
-									vd += 3
+									vd += valueNA
 								else
 									if distance <= 0.2 || distance == 0.0 then
-										vd += 2
+										vd += valueNA-1
 									end
 								end
 								# rank == rank
 								if (a[2] == b[2]) then
-									vd += 2
+									vd += valueR
 								end
 								# conference == conference
 								if (a[6] == b[6]) then
-									vd += 3
+									vd += valueConf
 								end
 								# year == year
 								if(a[7] == b[7]) then
-									vd += 1
+									vd += valueY
 								end
 								# value_desambiguation is greater than 3
 								if(vd > 3) then
@@ -53,17 +67,17 @@ class Desambiguation
 									same[1] = b
 									same[2] = vd
 									#troca de idp para o id verdadeiro
-									if(a[8].include? 'idp')
-										if(!b[8].include? 'idp')
-											a[8] = b[8]
-											a[4] = b[4]
-										end
-									else
-										if(b[8].include? 'idp')
-											b[8] = a[8]
-											b[4] = a[4]
-										end
-									end
+									#if(a[8].include? 'idp')
+									#	if(!b[8].include? 'idp')
+									#		a[8] = b[8]
+									#		a[4] = b[4]
+									#	end
+									#else
+									#	if(b[8].include? 'idp')
+									#		b[8] = a[8]
+									#		b[4] = a[4]
+									#	end
+									#end
 									sames.push(same)
 								end
 								Rails.logger.info "value desambiguation: #{vd}"
@@ -107,7 +121,61 @@ class Desambiguation
 			end
 			entitySames.push(sames)
 		end
+		createTriples(entitySames)
 	end
+
+#######################################################
+# Cria as triplas e exporta elas em formato .nt
+# --> Entrada: array of hashes
+# --> Saida: file and visualization
+#######################################################
+
+	def createTriples (vector)
+
+		Rails.logger.info vector
+		graph = RDF::Graph.new
+
+		Rails.logger.info RDF.type
+		Rails.logger.info RDF::RDFS.label
+		Rails.logger.info RDF::OWL.NamedIndividual
+		ufpel = RDF::Vocabulary.new("http://ufpel.edu.br/")
+		disambiguation = RDF::Vocabulary.new("http://vivoext.org/")
+		Rails.logger.info disambiguation.pair+"#value_disambiguation"
+		sames1 = []
+		sames2 = []
+		sames3 = []
+
+		sames1.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp5985904")
+		sames1.push("http://ufpel.edu.br/lattes/2809172806147764#author-idp21609248")
+		sames2.push("http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261")
+		sames2.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp6009760")
+		sames3.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp6000096")
+		sames3.push("http://ufpel.edu.br/lattes/0741704260227015#author-idp12601472")
+
+		Rails.logger.info disambiguation.pair
+
+
+		cont = 0
+		Rails.logger.info cont
+		Rails.logger.info vector.size
+
+
+		vector.each do | same |
+			if(same.empty? == false) then
+				Rails.logger.info cont
+				graph << [disambiguation.pair+"#has_dis-"+cont, RDF.type, disambiguation.pair]
+				graph << [disambiguation.pair+"#has_dis-"+cont, RDF.type, RDF::OWL.NamedIndividual]
+				graph << [disambiguation.pair+"#has_dis-"+cont, RDF::RDFS.label, '"#{cont}"@pt']
+				graph << [disambiguation.pair+"#has_dis-"+cont, disambiguation.pair+"#value_disambiguation", same[0][2]]
+				graph << [ufpel.lattes+same[0][0][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+cont]
+				graph << [ufpel.lattes+same[0][1][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+cont]
+				cont = cont+1
+			end
+		end
+		graph.dump(:ntriples)
+		RDF::Writer.open("hellou.nt") { |writer| writer << graph }
+	end
+
 
 
 #######################################################
