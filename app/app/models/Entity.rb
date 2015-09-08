@@ -36,8 +36,8 @@ class Entity
 					newSide = Array.new
 
 						sideB.each do |b|
-							distance = Levenshtein.normalized_distance(a[5],b[5])
-							if distance <= 0.2 || distance == 0.0 then
+							distance = Levenshtein.normalized_distance(a[5],b[5], 0.2)
+							if distance != nil then
 								arr = b
 								ent.push(arr)
 							else

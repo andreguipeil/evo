@@ -3,7 +3,7 @@
 <nav class="navbar navbar-default">
 	<div class="container">
 		<div class="navbar-header">
-			<a id="evo-tittle" class="navbar-brand" href="#">
+			<a id="evo-tittle" class="navbar-brand" href="/">
 				<div id="div-logo">
 					<%= image_tag("logo_evo_small.png", :alt => "Evoluir", :id => "logo") %>
 				</div>
@@ -14,8 +14,8 @@
 		</div>
 		<div id="navbar">
 			<ul class="nav navbar-nav">
-				<li class="active"><%= link_to "Home", '', :method => :get %></li>
-				<li><%= link_to "About", 'oficina#about', :method => :get %></li>
+				<li class="active"><%= link_to "Home", oficina_path, :method => :get %></li>
+				<li><%= link_to "About", oficina_about_path, :method => :get %></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a onclick="teste()">Link</a></li>
@@ -29,128 +29,149 @@
 <div class="container">
 
 	<div class="container">
+		<div class="row">
+			<form id='form_des'>
+				<div class="col-xs-6">
 
-		<table id="listGraphos" class="table table-striped table-hover">
-		      		<caption><h1>Lista de Grafos Disponíveis</h1></caption>
-			      	<thead>
-			        		<tr>
-			          			<th id="id">#</th>
-			          			<th>Grafo</th>
-			        		</tr>
-			      	</thead>
-			      	<tbody>
-			        		<tr id='1'>
-			          			<th id="id" scope="row">1</th>
-			          			<td>http://ufpel.edu.br</td>
-			        		</tr>
-			        		<tr id='2'>
-			          			<th id="id" scope="row">2</th>
-			          			<td>http://laropa.com</td>
-			        		</tr>
-			        		<tr id='3'>
-			          			<th id="id" scope="row">3</th>
-			          			<td>http://laburb.com</td>
-			        		</tr>
+					<table id="listGraphos" class="table table-striped table-hover">
+				      		<caption><h1>Lista de Grafos Disponíveis</h1></caption>
+					      	<thead>
+					        		<tr>
+					          			<th id="id">#</th>
+					          			<th>Grafo</th>
+					          			<th>Navigation</th>
+					        		</tr>
+					      	</thead>
+					      	<tbody>
+					        		<tr id='1'>
+					          			<th id="id" scope="row">1</th>
+					          			<td>http://ufpel.edu.br</td>
+					        			<td id="id"   onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+					        		</tr>
+					        		<tr id='2'>
+					          			<th id="id" scope="row">2</th>
+					          			<td>http://laropa.com</td>
+					        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+					        		</tr>
+					        		<tr id='3'>
+					          			<th id="id" scope="row">3</th>
+					          			<td>http://laburb.com</td>
+					        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+					        		</tr>
 
-			        		<tr id='4'>
-			          			<th id="id" scope="row">4</th>
-			          			<td>http://peil.com</td>
-			        		</tr>
-				</tbody>
-		</table>
+					        		<tr id='4'>
+					          			<th id="id" scope="row">4</th>
+					          			<td>http://peil.com</td>
+					          			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+					        		</tr>
+						</tbody>
+					</table>
+					<div class="form-group">
+			    			<label for="label-graph">Grafo</label>
+						<input type="text" class="form-control" id="graph" placeholder="Digite o grafo em que deseja aplicar a desambiguação. Ex: http://lattes.edu.br">
+			  		</div>
 
-		<hr>
+				</div>
+				<div class="col-xs-6" style='margin-top:50px;'>
+				  		<div class="form-group" style="margin-top:30px;margin-bottom:50px;margin-left:18px;margin-right:20px;">
+				    			<label for="">Nivel de Desambiguação</label>
+				    			<select class="form-control col-xs-2" id="vd" >
+				    				<option>Selecione o nível de desambiguação</option>
+								<option>1</option>
+							  	<option>2</option>
+							  	<option>3</option>
+							  	<option>4</option>
+							  	<option>5</option>
+							  	<option>6</option>
+							  	<option>7</option>
+							  	<option>8</option>
+							  	<option>9</option>
+							  	<option>10</option>
+							</select>
+				    		</div>
 
-		<form id='form_des' style='width:600px;'>
-	  		<div class="form-group">
-	    			<label for="label-graph">Grafo</label>
-	    			<input type="text" class="form-control" id="graph" placeholder="Digite o grafo em que deseja aplicar a desambiguação. Ex: http://lattes.edu.br">
-	  		</div>
-	  		<div class="form-group">
-	    			<label for="">Nivel de Desambiguação</label>
-	    			<select class="form-control" id="vd" style='width:300px;'>
-	    				<option>Selecione o nível de desambiguação</option>
-					<option>1</option>
-				  	<option>2</option>
-				  	<option>3</option>
-				  	<option>4</option>
-				  	<option>5</option>
-				  	<option>6</option>
-				  	<option>7</option>
-				  	<option>8</option>
-				  	<option>9</option>
-				  	<option>10</option>
-				</select>
-	    		</div>
-	    		<hr>
-	    		<div class="form-group">
-	    			<label for="">Peso do Artigo</label>
-	    			<select class="form-control" id="nameArticle" style='width:300px;'>
-	    				<option>Selecione o peso</option>
-					<option>1</option>
-				  	<option>2</option>
-				  	<option>3</option>
-				  	<option>4</option>
-				  	<option>5</option>
-				  	<option>6</option>
-				  	<option>7</option>
-				  	<option>8</option>
-				  	<option>9</option>
-				  	<option>10</option>
-				</select>
-	    		</div>
-	    		<div class="form-group">
-	    			<label for="">Peso do Rank</label>
-	    			<select class="form-control" id="rank" style='width:300px;'>
-	    				<option>Selecione o peso</option>
-					<option>1</option>
-				  	<option>2</option>
-				  	<option>3</option>
-				  	<option>4</option>
-				  	<option>5</option>
-				  	<option>6</option>
-				  	<option>7</option>
-				  	<option>8</option>
-				  	<option>9</option>
-				  	<option>10</option>
-				</select>
-	    		</div>
-	    		<div class="form-group">
-	    			<label for="">Peso da Conferencia</label>
-	    			<select class="form-control" id="conference" style='width:300px;'>
-	    				<option>Selecione o peso</option>
-					<option>1</option>
-				  	<option>2</option>
-				  	<option>3</option>
-				  	<option>4</option>
-				  	<option>5</option>
-				  	<option>6</option>
-				  	<option>7</option>
-				  	<option>8</option>
-				  	<option>9</option>
-				  	<option>10</option>
-				</select>
-	    		</div>
-	    		<div class="form-group">
-	    			<label for="">Peso do Year</label>
-	    			<select class="form-control" id="year" style='width:300px;'>
-	    				<option>Selecione o peso</option>
-					<option>1</option>
-				  	<option>2</option>
-				  	<option>3</option>
-				  	<option>4</option>
-				  	<option>5</option>
-				  	<option>6</option>
-				  	<option>7</option>
-				  	<option>8</option>
-				  	<option>9</option>
-				  	<option>10</option>
-				</select>
-	    		</div>
-	    		<p class="help-block">Para desambiguar basta clicar, lembrando que este processo pode demorar um pouco.</p>
-		</form>
-		<button  class="btn btn-success" onclick="sendForm()">Desambiguar</button>
+				    		<div class="col-xs-6">
+				    			<div class="form-group">
+					    			<label for="">Peso do Artigo</label>
+					    			<select class="form-control" id="nameArticle" style='width:250px;'>
+					    				<option>Selecione o peso</option>
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								  	<option>6</option>
+								  	<option>7</option>
+								  	<option>8</option>
+								  	<option>9</option>
+								  	<option>10</option>
+								</select>
+					    		</div>
+					    		<div class="form-group">
+					    			<label for="">Peso do Year</label>
+					    			<select class="form-control" id="year" style='width:250px;'>
+					    				<option>Selecione o peso</option>
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								  	<option>6</option>
+								  	<option>7</option>
+								  	<option>8</option>
+								  	<option>9</option>
+								  	<option>10</option>
+								</select>
+					    		</div>
+				    		</div>
+				    		<div class="col-xs-6">
+
+
+				    			<div class="form-group">
+					    			<label for="">Peso do Rank</label>
+					    			<select class="form-control" id="rank" style='width:250px;'>
+					    				<option>Selecione o peso</option>
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								  	<option>6</option>
+								  	<option>7</option>
+								  	<option>8</option>
+								  	<option>9</option>
+								  	<option>10</option>
+								</select>
+				    			</div>
+				    			<div class="form-group">
+					    			<label for="">Peso da Conferência</label>
+					    			<select class="form-control" id="conference" style='width:250px;'>
+					    				<option>Selecione o peso</option>
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								  	<option>6</option>
+								  	<option>7</option>
+								  	<option>8</option>
+								  	<option>9</option>
+								  	<option>10</option>
+								</select>
+					    		</div>
+				    		</div>
+
+				    	</div>
+				</div>
+			</form>
+			<hr>
+			<div class="col-xs-12 text-center" style="margin-top:40px; margin-bottom:30px;">
+				<p class="help-block">Para desambiguar basta clicar, lembrando que este processo pode demorar um pouco.</p>
+				<button  class="btn btn-success" onclick="sendForm()">Desambiguar</button>
+			</div>
+		</div>
 	</div>
+
 
 	<div id="results" class="row">
 
@@ -197,6 +218,16 @@
 	    	}
 	}
 
+	function navigation(){
+		var str;
+		var a;
+		str = document.getElementById("graph").value;
+		if(str != ''){
+			a = str.split(":");
+			console.log(a);
+			location.href="/oficina/navigation?graph0="+a[0]+"&graph1="+a[1];
+		}
+	}
 
 	function sendForm(){
 		if($("#graph").val() == ''){
@@ -224,6 +255,9 @@
 					           	'year': $("#year").val(),
 					           },
 					success : function($data) {
+						$('#aviso_titulo').html('Desambiguação Completa');
+            						$('#aviso_mensagem').html('Desambiguação feita com sucesso!');
+           			 			$('#aviso').modal('show');
 			            		},
 			            		error: function(xhr, ajaxOptions, thrownError) {
 					}
@@ -231,5 +265,79 @@
             			}
 		}
 	}
+
+
+
+
+
+/*
+
+var query="PREFIX dc:       	<http://purl.org/dc/elements/1.1/> PREFIX bibo: 		<http://purl.org/ontology/bibo/> SELECT DISTINCT ?name ?person ?id FROM <http://peil.com> WHERE {?person bibo:identifier ?id . ?person dc:title ?name. }";
+var data=sparqlQuery(query, "http://localhost:8890/sparql/");
+
+function sparqlQuery(query, baseURL, format) {
+	if(!format) {
+		format="application/json";
+	}
+
+	var params={
+		"default-graph": "", "should-sponge": "soft", "query": query,
+		"debug": "on", "timeout": "", "format": format,
+		"save": "display", "fname": ""
+	};
+
+	var querypart="";
+	for(var k in params) {
+		querypart+=k+"="+encodeURIComponent(params[k])+"&";
+	}
+
+	var queryURL=baseURL + '?' + querypart;
+
+
+	  var xhr = createCORSRequest('GET', queryURL);
+	  if (!xhr) {
+	    alert('CORS not supported');
+	    return;
+	  }
+
+	  // Response handlers.
+	  xhr.onload = function() {
+	    var text = xhr.responseText;
+	    var title = getTitle(text);
+	    alert('Response from CORS request to ' + url + ': ' + title);
+	  };
+
+	  xhr.onerror = function() {
+	    alert('Woops, there was an error making the request.');
+	  };
+
+	  xhr.send();
+
+
+  	return JSON.parse(xhr.responseText);
+
+}
+
+
+
+
+
+// Create the XHR object.
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // XHR for Chrome/Firefox/Opera/Safari.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // XDomainRequest for IE.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+}
+*/
 
 </script>

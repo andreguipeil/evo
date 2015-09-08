@@ -121,7 +121,7 @@ class Desambiguation
 			end
 			entitySames.push(sames)
 		end
-		createTriples(entitySames)
+		return entitySames
 	end
 
 #######################################################
@@ -130,50 +130,41 @@ class Desambiguation
 # --> Saida: file and visualization
 #######################################################
 
-	def createTriples (vector)
-
-		Rails.logger.info vector
+	def createTriples (vector, nameGraph)
 		graph = RDF::Graph.new
-
-		Rails.logger.info RDF.type
-		Rails.logger.info RDF::RDFS.label
-		Rails.logger.info RDF::OWL.NamedIndividual
 		ufpel = RDF::Vocabulary.new("http://ufpel.edu.br/")
 		disambiguation = RDF::Vocabulary.new("http://vivoext.org/")
-		Rails.logger.info disambiguation.pair+"#value_disambiguation"
-		sames1 = []
-		sames2 = []
-		sames3 = []
-
-		sames1.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp5985904")
-		sames1.push("http://ufpel.edu.br/lattes/2809172806147764#author-idp21609248")
-		sames2.push("http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261")
-		sames2.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp6009760")
-		sames3.push("http://ufpel.edu.br/lattes/0702035357125121#author-idp6000096")
-		sames3.push("http://ufpel.edu.br/lattes/0741704260227015#author-idp12601472")
-
-		Rails.logger.info disambiguation.pair
-
-
 		cont = 0
-		Rails.logger.info cont
-		Rails.logger.info vector.size
-
+		triples = []
 
 		vector.each do | same |
 			if(same.empty? == false) then
-				Rails.logger.info cont
-				graph << [disambiguation.pair+"#has_dis-"+cont, RDF.type, disambiguation.pair]
-				graph << [disambiguation.pair+"#has_dis-"+cont, RDF.type, RDF::OWL.NamedIndividual]
-				graph << [disambiguation.pair+"#has_dis-"+cont, RDF::RDFS.label, '"#{cont}"@pt']
-				graph << [disambiguation.pair+"#has_dis-"+cont, disambiguation.pair+"#value_disambiguation", same[0][2]]
-				graph << [ufpel.lattes+same[0][0][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+cont]
-				graph << [ufpel.lattes+same[0][1][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+cont]
-				cont = cont+1
+				temp = RDF::Graph.new
+
+				id = "%06d" % cont
+				graph << [disambiguation.pair+"#has_dis-"+id, RDF.type, disambiguation.pair]
+				graph << [disambiguation.pair+"#has_dis-"+id, RDF.type, RDF::OWL.NamedIndividual]
+				graph << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
+				graph << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[0][2]]
+				graph << [ufpel.lattes+same[0][0][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
+				graph << [ufpel.lattes+same[0][1][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
+
+
+				temp << [disambiguation.pair+"#has_dis-"+id, RDF.type, disambiguation.pair]
+				temp << [disambiguation.pair+"#has_dis-"+id, RDF.type, RDF::OWL.NamedIndividual]
+				temp << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
+				temp << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[0][2]]
+				temp << [ufpel.lattes+same[0][0][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
+				temp << [ufpel.lattes+same[0][1][8], disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
+
+
+			triples[cont] = temp.dump(:ntriples)
+			cont = cont+1
 			end
 		end
 		graph.dump(:ntriples)
-		RDF::Writer.open("hellou.nt") { |writer| writer << graph }
+		RDF::Writer.open(nameGraph) { |writer| writer << graph }
+		return triples
 	end
 
 
@@ -204,9 +195,8 @@ class Desambiguation
 			coAuthors.each do |row1|
 				Thread.new {
 					coAuthors.each do |row2|
-
-						distance = Levenshtein.normalized_distance(row1[2], row2[2])
-						if distance < 0.5 && distance != 0.0 then
+						distance = Levenshtein.normalized_distance(row1[2], row2[2], 0.5)
+						if distance != nil then
 							line = Hash.new
 							line[0] = row1[2]
 							line[1] = row1[1]

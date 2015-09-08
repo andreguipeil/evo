@@ -7,7 +7,9 @@ Rails.application.routes.draw do
 	 root  'oficina#index'
 
 	# Example of regular route:
-   	get 'oficina', :to => 'oficina#about'
+
+   	get 'oficina', :to => 'oficina#index'
+   	get 'oficina/about', :to => 'oficina#about'
 
 	# Example of named route that can be invoked with purchase_url(id: product.id)
 	#   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
@@ -25,6 +27,7 @@ Rails.application.routes.draw do
 	resources :oficina do
 	     collection do
 	     	get 'desambiguar'
+	     	get 'navigation'
 	     end
 	end
 
