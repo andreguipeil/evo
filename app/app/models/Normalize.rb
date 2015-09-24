@@ -1,6 +1,6 @@
 class Normalize
 
-
+$KCODE = 'UTF8'
 #######################################################
 # Transforma os dados vindos do vituoso do formato CSV para um Array com Hash
 # Já parametrizado conforme o esperado
@@ -10,37 +10,28 @@ class Normalize
 	def csvToArray (data, contFields)
 		i = 0;
 		triples = Array.new
-		cont = false
+		data.shift
 		data.each do |row|
-			if cont == false
-				row.pop
-				cont = true
-			else
-				line = Hash.new
-				while i < contFields do
-   					line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8")
-   					i += 1
-   				end
-   				# collumn 3 = nome do rdf
-   				line[3] = line[3].parameterize.to_s
-   				line[3] = retireConectivesNames(line[3])
-   				# collumn 4 = nome do co-author
-   				line[4] = line[4].parameterize.to_s
-   				line[4] = retireConectivesNames(line[4])
-   				# collumn 5 = nome do artigo
-				line[5] = line[5].parameterize.to_s
-   				line[5] = retireConectives(line[5])
-   				# collumn 6 = nome do congresso
-   				line[6] = line[6].parameterize.to_s
-   				line[6] = retireConectives(line[6])
-   				# collumn 8 = referencia do author
-
-   				Rails.logger.info line[8]
-   				line[8] = line[8].split("lattes").last
-				Rails.logger.info line[8]
-				triples.push(line)
-				i = 0
+			line = Hash.new
+			while i < contFields do
+				line[i] = row[i].encode("ASCII-8BIT").force_encoding("utf-8")
+				i += 1
 			end
+			# collumn 3 = nome autor
+			line[3] = line[3].parameterize.to_s
+			line[3] = retireConectivesNames(line[3])
+			# collumn 5 = nome do artigo
+			line[5] = line[5].parameterize.to_s
+			line[5] = retireConectives(line[5])
+			# collumn 6 = conferencia
+			line[6] = line[6].parameterize.to_s
+			line[6] = retireConectives(line[6])
+
+			#Rails.logger.info line[8]
+			#line[8] = line[8].split("lattes").last
+			#Rails.logger.info line[8]
+			triples.push(line)
+			i = 0
 		end
 		return triples
 	end
@@ -136,6 +127,51 @@ class Normalize
 			name = name.gsub('-del-', '-')
 
 		return name
+	end
+
+#######################################################
+# organiza todos os perfis do grafo
+# --> Entrada: Array em CSV
+# --> Saida: Array
+#######################################################
+	def normalizeProfiles (dataName, dataFamilyName, dataGivenName, type)
+		profiles  = Array.new
+		dataName.shift			# retira o primeiro elemento que é o cabecalho
+		case type
+		when 0
+			dataFamilyName.shift		# retira o primeiro elemento que é o cabecalho
+			dataGivenName.shift		# retira o primeiro elemento que é o cabecalho
+
+
+			dataName.each do | row |
+				profile = Hash.new
+				profile['refBy'] = row[0].encode("ASCII-8BIT").force_encoding("utf-8")
+				profile['name'] = row[1].encode("ASCII-8BIT").force_encoding("utf-8")
+				profile['givenName'] = Array.new
+				dataGivenName.each do | a |
+					if a[0] == profile['refBy'] then
+						profile["givenName"].push(a[1].encode("ASCII-8BIT").force_encoding("utf-8"))
+					end
+				end
+				profile['familyName'] = Array.new
+				dataFamilyName.each do | b |
+					if b[0] == profile['refBy'] then
+						profile["familyName"].push(b[1].encode("ASCII-8BIT").force_encoding("utf-8"))
+					end
+				end
+				profiles.push(profile)
+			end
+		when 1
+			dataName.each do | row |
+				profile = Hash.new
+				profile['refBy'] = row[0].encode("ASCII-8BIT").force_encoding("utf-8")
+				profile['name'] = row[1].encode("ASCII-8BIT").force_encoding("utf-8")
+				profiles.push(profile)
+			end
+		else
+			Rails.logger.info "Erro no case"
+		end
+		return profiles
 	end
 
 end

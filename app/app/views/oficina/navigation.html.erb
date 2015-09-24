@@ -33,8 +33,25 @@
 			</div>
 
 		</div>
-		<div class="col-xs-8 text-center" style="margin-top:30px;">
-			<caption><h1>Resultados</h1></caption>
+		<div class="col-xs-8 text-left">
+
+			<form class="form-horizontal">
+                			<div class="input-group" >
+      					<div class="input-group-addon"><b>Grafo</b></div>
+      					<input id='graph' type="text" class="form-control" value='<%= @send['graph'] %>'>
+    				</div>
+
+                			<div class="input-group" >
+      					<div class="input-group-addon"><b>Número de Pesquisadores</b></div>
+      					<div type="text" class="form-control"><%= @send['researchers'] %></div>
+    				</div>
+
+  				<div class="input-group form-group-lg">
+      					<input id='nameProfile' class="form-control" type="text" id="formGroupInputLarge" placeholder="Digite o nome do Pesquisador">
+  				<div  class="input-group-addon btn" onclick="searchProfile()"><b>Pesquisar</b></div>
+  				</div>
+
+  			</form>
 		</div>
 		<div class="col-xs-2 text-center" style="margin-top:30px;">
 			<div id="div-logo">
@@ -43,28 +60,101 @@
 		</div>
 	</div>
 <hr>
-<div id="results" class="row" >
+	<div id="results" class="row" >
+		<div class="col-xs-4 text-left">
+			<% if( @send['researchers'] > 20 ) then %>
+				<table id='listProfiles' class='table table-striped table-hover'>
+			      	</table>
+			<% else %>
+				<%= generate_table_authors(@send['profiles']) %>
+			<% end %>
+		</div>
+		<div class="col-xs-6 text-left">
 
-	<table id="listTriples" class="table table-striped table-hover">
-
-	      	<thead>
-	        		<tr>
-	          			<th id="col1" class='text-center'> Coluna 1 </th>
-	          			<th id="col2" class='text-center'> Coluna 2 </th>
-	          			<th id="col3" class='text-center'> Coluna 3 </th>
-	        		</tr>
-	      	</thead>
-	      	<tbody>
-
-		</tbody>
-	</table>
-
-</div>
+		</div>
+	</div>
 </div>
 
+
+<div  id="aviso" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="aviso_titulo">Modal title</h4>
+			</div>
+			<div class="modal-body" style="margin-top: 10px;margin-bottom: 10px;padding-top: 10px;padding-bottom: 40px">
+				<div class="col-lg-1">
+					<i id="icone" class="fa fa-info-circle fa-3x"></i>
+				</div>
+				<div class="col-lg-11" style="margin-top: 10px">
+					<p id="aviso_mensagem"> One fine body&hellip;</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="aviso_botao" type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Certo</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div>
 
 <script >
 
+	$(document).ready(function(){
+		activeList();
+	});
+
+
+	function activeList(){
+		var rows = document.getElementById("listProfiles").rows;
+		if (rows != 0) {
+		    	for (var i = 0; i < rows.length; i++) {
+		        		rows[i].onclick = function() {
+		            			if(this != ''){
+		            				getProfile($(this).closest('tr').children('td#refBy').text());
+		            			}
+		        		};
+		    	}
+		}
+	}
+
+
+	function searchProfile(){
+		//console.log($("#graph").val());
+		//console.log($("#nameProfile").val().length);
+		if($("#nameProfile").val() == ''){
+			$('#aviso_titulo').html('Campos incompletos');
+			$('#aviso_mensagem').html('Você não escolheu o nome do <b>Pesquisador</b>.');
+		 	$('#aviso').modal('show');
+			return 0;
+		} else {
+			$.ajax({
+				url: '/oficina/getProfiles',
+				dataType: 'json',
+				data: {
+					'graph' : $("#graph").val(),
+				           	'nameProfile': $("#nameProfile").val()
+				           },
+				success : function(data) {
+					var element = document.getElementById("listProfiles");
+					element.innerHTML= "";
+					element.innerHTML = "<thead><tr><th id='col1' class='text-left'> Indice </th><th id='col2' class='text-left'> Pesquisadores </th></tr></thead>";
+					for(var i = 0; i < data.length; i++){
+						element.innerHTML += "<tr><td  id='id' class='text-left'>"+(i+1)+"</td><td  id='name' class='text-left'>"+data[i]['name']+"</td><td  id='refBy' class='text-left' style='display:none;'>"+data[i]['refBy']+"</td></tr>";
+					}
+					element.innerHTML += "</tbody>"
+					activeList();
+		            		},
+		            		error: function(xhr, ajaxOptions, thrownError) {
+				}
+			});
+		}
+	}
+
+	function getProfile(refBy){
+
+		console.log(refBy);
+	}
 
 </script>
 

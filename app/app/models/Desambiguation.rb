@@ -15,41 +15,64 @@ class Desambiguation
 #######################################################
 
 	def desambiguationEntities (entities, values)
-		valueNA 	= values['nameArticle'].to_i;
-		valueR 		= values['rank'].to_i;
-		valueConf 	= values['conference'].to_i;
-		valueY 		= values['year'].to_i;
-		Rails.logger.info values
+		valueNA 		= values['nameArticle'].to_i;
+		valueR 			= values['rank'].to_i;
+		valueConf 		= values['conference'].to_i;
+		valueY 			= values['year'].to_i;
+		valueDisambiguation 	= values['vd'].to_i;
+		valueLevenshtein 	= values['levDist'].to_f;
+
+		estatistica = Array.new
+		nivel1 = 0	# Se os perfis são diferentes
+		nivel2 = 0	# Verificação da distância
+		nivel3 = 0	# Desambiguados
+		nivel4 = 0 	# Não desambiguados
+		nivel5 = 0	# Valor acima do filtro (sames)
+		nivel6 = 0	# artigos iguais
+		nivel7 = 0	# artigos muito proximos
 
 		entitiesTemp = entities.dup
 		entitySames = Array.new
 		entitiesTemp.each do | ent |
+			est = Hash.new
 			entityA = ent.dup
 			entityB = ent.dup
 			sames = Array.new
-
+			indexes = Array.new
+			indexA = 0
 			entityA.each do | a |
-				if(entityB.size > 0) then
-					newEntity = Array.new
-					entityB.each do | b |
-						if(a[0] != b[0]) then
-							distance = Levenshtein.normalized_distance(a[4],b[4])
-							if distance <= 0.5 || distance == 0.0 then
+				indexB = 0
+				entityB.each do | b |
+					if(a[0] != b[0]) then
+						nivel1 = nivel1+1
+						tempIndex1 = Array.new
+						tempIndex1.push(indexA)
+						tempIndex1.push(indexB)
+						tempIndex2 = Array.new
+						tempIndex2.push(indexB)
+						tempIndex2.push(indexA)
+						if(!( (indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)) )) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
+							distance = Levenshtein.normalized_distance(a[3],b[3], valueLevenshtein) 		# verifica a distancia do author
+							# colocar um cont aqui
+							nivel2 = nivel2+1
+							if distance != nil then
 								Rails.logger.info "======================="
 								Rails.logger.info a
 								Rails.logger.info b
-
 								vd = 0
 								# name article == name article
 								if(a[5] == b[5]) then
 									vd += valueNA
+									nivel6 = nivel6+1
 								else
-									if distance <= 0.2 || distance == 0.0 then
+									distanceArticle = Levenshtein.normalized_distance(a[5],b[5], 0.05) # verifica a distancia do author
+									if distanceArticle != nil then
 										vd += valueNA-1
+										nivel7 = nivel7+1
 									end
 								end
 								# rank == rank
-								if (a[2] == b[2]) then
+								if (a[4] == b[4]) then
 									vd += valueR
 								end
 								# conference == conference
@@ -61,7 +84,7 @@ class Desambiguation
 									vd += valueY
 								end
 								# value_desambiguation is greater than 3
-								if(vd > 3) then
+								if(vd > valueDisambiguation) then
 									same = Hash.new
 									same[0] = a
 									same[1] = b
@@ -79,39 +102,53 @@ class Desambiguation
 									#	end
 									#end
 									sames.push(same)
+									indexes.push(tempIndex1)
 								end
+								nivel3 = nivel3+1
 								Rails.logger.info "value desambiguation: #{vd}"
 								Rails.logger.info "======================="
 							else
-								newEntity.push(b)
+								nivel4 = nivel4+1
+								Rails.logger.info "Não houve Desambiguação entre"
+								Rails.logger.info "="
+								Rails.logger.info a[3]
+								Rails.logger.info b[3]
+								Rails.logger.info "======================="
 							end
-						else
-							newEntity.push(b)
+
 						end
 					end
-					entityB = newEntity
+				indexB = indexB+1
 				end
+			indexA = indexA+1
 			end
 
-			Rails.logger.info "===================================="
-			Rails.logger.info "LOG DE DISAMBIGUATION"
-			Rails.logger.info "===================================="
+			# estatistica de cada entidade
+			est['nivel1'] = nivel1
+			est['nivel2'] = nivel2
+			est['nivel3'] = nivel3
+			est['nivel4'] = nivel4
+			est['nivel5'] = sames.size
+			est['nivel6'] = nivel6
+			est['nivel7'] = nivel7
+			estatistica.push(est);
+			## ====
 
 			sames.each do |same|
-				Rails.logger.info "COAUTHOR 1 ====== COAUTHOR 2"
-				Rails.logger.info same[0][4] +" <==> "+ same[1][4]
+				Rails.logger.info "===================================="
+				Rails.logger.info "LOG DE DISAMBIGUATION"
+				Rails.logger.info "===================================="
+				Rails.logger.info "AUTHOR 1 ====== AUTHOR 2"
+				Rails.logger.info same[0][3] +" <==> "+ same[1][3]
 				Rails.logger.info
 				Rails.logger.info "COMPARSIONS"
 				Rails.logger.info "["+same[0][0] +"] == ["+same[1][0]+"]"
 				Rails.logger.info "-----"
 				Rails.logger.info same[0][5] +" <==> "+ same[1][5]
-				Rails.logger.info same[0][2] +" <==> "+ same[1][2]
+				Rails.logger.info same[0][4] +" <==> "+ same[1][4]
 				Rails.logger.info same[0][6] +" <==> "+ same[1][6]
 				Rails.logger.info same[0][7] +" <==> "+ same[1][7]
 				Rails.logger.info "-----"
-				Rails.logger.info "ID CHANGE"
-				Rails.logger.info same[0][8] +" <==> "+ same[1][8]
-				Rails.logger.info "+++"
 				Rails.logger.info "[VD] value disambiguation: " + same[2].to_s
 				Rails.logger.info " "
 				Rails.logger.info "============"
@@ -119,8 +156,13 @@ class Desambiguation
 				Rails.logger.info "==="
 			#	Rails.logger.info same[0][4] +" do RDF "+ same[0][0] +" - "+ same[0][3]  +" -- "+ same[0][8]+" == "+ same[1][4] +" do RDF "+ same[1][0] +" - "+ same[1][3] + " -- "+ same[1][8]
 			end
+
 			entitySames.push(sames)
 		end
+
+		fileEstatistica = FileArray.new
+		fileEstatistica.insertLogFile(estatistica, 1)
+
 		return entitySames
 	end
 

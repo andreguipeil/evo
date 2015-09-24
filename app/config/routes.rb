@@ -28,6 +28,7 @@ Rails.application.routes.draw do
 	     collection do
 	     	get 'desambiguar'
 	     	get 'navigation'
+	     	get 'getProfiles'
 	     end
 	end
 
