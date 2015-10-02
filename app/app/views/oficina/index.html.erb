@@ -31,71 +31,101 @@
 	<div class="container">
 		<div class="row">
 			<form id='form_des'>
-				<div class="col-xs-6">
+				<table id="listGraphos" class="table table-striped table-hover">
+			      		<caption><h3>Lista de Grafos Disponíveis</h3></caption>
+				      	<thead>
+				        		<tr>
+				          			<th id="id">#</th>
+				          			<th>Grafo</th>
+				          			<th>Navigation</th>
+				        		</tr>
+				      	</thead>
+				      	<tbody>
+				        		<tr id='1'>
+				          			<th id="id" scope="row">1</th>
+				          			<td>http://computacao.ufpel.ebu.br</td>
+				        			<td id="id"   onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+				        		</tr>
+				        		<tr id='2'>
+				          			<th id="id" scope="row">2</th>
+				          			<td>http://gaci.com</td>
+				        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+				        		</tr>
+				        		<tr id='3'>
+				          			<th id="id" scope="row">3</th>
+				          			<td>http://laburb.com</td>
+				        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+				        		</tr>
 
-					<table id="listGraphos" class="table table-striped table-hover">
-				      		<caption><h1>Lista de Grafos Disponíveis</h1></caption>
-					      	<thead>
-					        		<tr>
-					          			<th id="id">#</th>
-					          			<th>Grafo</th>
-					          			<th>Navigation</th>
-					        		</tr>
-					      	</thead>
-					      	<tbody>
-					        		<tr id='1'>
-					          			<th id="id" scope="row">1</th>
-					          			<td>http://computacao.ufpel.ebu.br</td>
-					        			<td id="id"   onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
-					        		</tr>
-					        		<tr id='2'>
-					          			<th id="id" scope="row">2</th>
-					          			<td>http://gaci.com</td>
-					        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
-					        		</tr>
-					        		<tr id='3'>
-					          			<th id="id" scope="row">3</th>
-					          			<td>http://laburb.com</td>
-					        			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
-					        		</tr>
+				        		<tr id='4'>
+				          			<th id="id" scope="row">4</th>
+				          			<td>http://peil.com</td>
+				          			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
+				        		</tr>
+					</tbody>
+				</table>
+				<div class="form-group">
+		    			<label for="label-graph">Grafo</label>
+					<input type="text" class="form-control" id="graph" placeholder="Digite o grafo em que deseja aplicar a desambiguação. Ex: http://lattes.edu.br">
+		  		</div>
+		  		<br>
+		  		<h3 class='text-center'>Clusterização</h3>
+		  		<br>
+		  		<div class='row'>
+		  			<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="rules" class="control-label" style="padding:6px 12px;">Critério</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="rules" style='width:250px;'>
+				    				<option>Selecione o critério</option>
+								<option value='1'>Nome do Autor</option>
+							  	<option value='2'>Nome do Artigo</option>
+							  	<option value='3'>Nome do Artito e Ano</option>
+							</select>
+						</div>
+					</form>
+		  		</div>
+				<br>
 
-					        		<tr id='4'>
-					          			<th id="id" scope="row">4</th>
-					          			<td>http://peil.com</td>
-					          			<td id="id"  onclick="navigation()"><%= image_tag("boat-3.png", :alt => "Evoluir", :id => "icon") %></td>
-					        		</tr>
-						</tbody>
-					</table>
-					<div class="form-group">
-			    			<label for="label-graph">Grafo</label>
-						<input type="text" class="form-control" id="graph" placeholder="Digite o grafo em que deseja aplicar a desambiguação. Ex: http://lattes.edu.br">
-			  		</div>
+				<h3 class='text-center'>Parâmetros</h3>
+				<hr>
+				<div class='row'>
+					<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="name_author" class="control-label" style="padding:6px 12px;">Nome do Autor</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="name_author" style='width:250px;'>
+				    				<option>Selecione o peso</option>
+								<option>1</option>
+							  	<option>2</option>
+							  	<option>3</option>
+							  	<option>4</option>
+							  	<option>5</option>
+							  	<option>6</option>
+							  	<option>7</option>
+							  	<option>8</option>
+							  	<option>9</option>
+							  	<option>10</option>
+							</select>
 
-
+						</div>
+						<div class='col-xs-4' >
+							<input type="number" step="0.01" class="form-control" id="name_author_lev" placeholder="Distância de Levesthein Ex: 0,02 => 2%" style="width:340px;">
+						</div>
+					</form>
 				</div>
-				<div class="col-xs-6" style='margin-top:50px;'>
-					<div class="col-xs-6">
-				  		<div class="form-group" style="margin-top:px;margin-bottom:50px;">
-				    			<label for="">Nivel de Desambiguação</label>
-				    			<select class="form-control col-xs-2" id="vd" >
-				    				<option>Selecione nível</option>
-								<option>1</option>
-							  	<option>2</option>
-							  	<option>3</option>
-							  	<option>4</option>
-							  	<option>5</option>
-							  	<option>6</option>
-							  	<option>7</option>
-							  	<option>8</option>
-							  	<option>9</option>
-							  	<option>10</option>
-							</select>
-				    		</div>
 
+				<br>
 
-			    			<div class="form-group">
-				    			<label for="">Peso do Artigo</label>
-				    			<select class="form-control" id="nameArticle" style='width:250px;'>
+				<div class='row'>
+					<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="name_article" class="control-label" style="padding:6px 12px;">Nome do Artigo</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="name_article" style='width:250px;'>
 				    				<option>Selecione o peso</option>
 								<option>1</option>
 							  	<option>2</option>
@@ -108,66 +138,114 @@
 							  	<option>9</option>
 							  	<option>10</option>
 							</select>
-				    		</div>
-				    		<div class="form-group">
-				    			<label for="">Peso do Year</label>
-				    			<select class="form-control" id="year" style='width:250px;'>
-				    				<option>Selecione o peso</option>
-								<option>1</option>
-							  	<option>2</option>
-							  	<option>3</option>
-							  	<option>4</option>
-							  	<option>5</option>
-							  	<option>6</option>
-							  	<option>7</option>
-							  	<option>8</option>
-							  	<option>9</option>
-							  	<option>10</option>
-							</select>
-				    		</div>
-			    		</div>
-			    		<div class="col-xs-6">
-						<div class="form-group">
-				    			<label for="label-graph">Distancia de Leveistein</label>
-							<input type="number" step="0.01" class="form-control" id="levDist" placeholder="Ex: 0,02 => 2%">
-				  		</div>
 
-			    			<div class="form-group">
-				    			<label for="">Peso do Rank</label>
-				    			<select class="form-control" id="rank" style='width:250px;'>
-				    				<option>Selecione o peso</option>
-								<option>1</option>
-							  	<option>2</option>
-							  	<option>3</option>
-							  	<option>4</option>
-							  	<option>5</option>
-							  	<option>6</option>
-							  	<option>7</option>
-							  	<option>8</option>
-							  	<option>9</option>
-							  	<option>10</option>
-							</select>
-			    			</div>
-			    			<div class="form-group">
-				    			<label for="">Peso da Conferência</label>
-				    			<select class="form-control" id="conference" style='width:250px;'>
-				    				<option>Selecione o peso</option>
-								<option>1</option>
-							  	<option>2</option>
-							  	<option>3</option>
-							  	<option>4</option>
-							  	<option>5</option>
-							  	<option>6</option>
-							  	<option>7</option>
-							  	<option>8</option>
-							  	<option>9</option>
-							  	<option>10</option>
-							</select>
-				    		</div>
-			    		</div>
-
-			    	</div>
+						</div>
+						<div class='col-xs-4' >
+							<input type="number" step="0.01" class="form-control" id="name_article_lev" placeholder="Distância de Levesthein Ex: 0,02 => 2%" style="width:340px;">
+						</div>
+					</form>
 				</div>
+
+				<br>
+
+				<div class='row'>
+					<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="name_conference" class="control-label" style="padding:6px 12px;">Nome da Conferência</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="name_conference" style='width:250px;'>
+				    				<option>Selecione o peso</option>
+								<option>1</option>
+							  	<option>2</option>
+							  	<option>3</option>
+							  	<option>4</option>
+							  	<option>5</option>
+							  	<option>6</option>
+							  	<option>7</option>
+							  	<option>8</option>
+							  	<option>9</option>
+							  	<option>10</option>
+							</select>
+
+						</div>
+						<div class='col-xs-4'>
+							<input type="number" step="0.01" class="form-control" id="name_conference_lev" placeholder="Distância de Levesthein Ex: 0,02 => 2%"  style="width:340px;">
+						</div>
+					</form>
+				</div>
+
+				<br>
+
+				<div class='row'>
+					<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="year" class="control-label" style="padding:6px 12px;">Ano do Artigo</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="year" style='width:250px;'>
+				    				<option>Selecione o peso</option>
+								<option>1</option>
+							  	<option>2</option>
+							  	<option>3</option>
+							  	<option>4</option>
+							  	<option>5</option>
+							  	<option>6</option>
+							  	<option>7</option>
+							  	<option>8</option>
+							  	<option>9</option>
+							  	<option>10</option>
+							</select>
+						</div>
+					</form>
+				</div>
+
+				<br>
+
+				<div class='row'>
+					<form class="form-inline">
+						<div class='col-xs-4'>
+							<label for="rank" class="control-label" style="padding:6px 12px;">Ranking do Autor</label>
+						</div>
+						<div class='col-xs-4'>
+							<select class="form-control control-label" id="rank" style='width:250px;'>
+				    				<option>Selecione o peso</option>
+								<option>1</option>
+							  	<option>2</option>
+							  	<option>3</option>
+							  	<option>4</option>
+							  	<option>5</option>
+							  	<option>6</option>
+							  	<option>7</option>
+							  	<option>8</option>
+							  	<option>9</option>
+							  	<option>10</option>
+							</select>
+
+						</div>
+					</form>
+				</div>
+
+				<br>
+				<hr>
+				<br>
+		  		<div class="form-group" style="margin-top:px;margin-bottom:50px;">
+		    			<label for="">Nivel de Desambiguação</label>
+		    			<select class="form-control col-xs-2" id="vd" >
+		    				<option>Selecione nível</option>
+						<option>1</option>
+					  	<option>2</option>
+					  	<option>3</option>
+					  	<option>4</option>
+					  	<option>5</option>
+					  	<option>6</option>
+					  	<option>7</option>
+					  	<option>8</option>
+					  	<option>9</option>
+					  	<option>10</option>
+					</select>
+				<div class="form-group">
+
 			</form>
 			<hr>
 			<div class="col-xs-12 text-center" style="margin-top:40px; margin-bottom:30px;">
@@ -234,118 +312,112 @@
 		}
 	}
 
+
+
 	function sendForm(){
-		if($("#graph").val() == ''){
-			console.log("aqui");
-			$('#aviso_titulo').html('Campos incompletos');
-            			$('#aviso_mensagem').html('Você não escolheu um <b>grafo.</b>.');
-           			 $('#aviso').modal('show');
-            			return 0;
-		} else {
-			if($("#vd").val().length > 2){
-            				$('#aviso_titulo').html('Campos incompletos');
-				$('#aviso_mensagem').html('Você não escolheu um <b>Nivel de desambiguação.</b>.');
-		 		$('#aviso').modal('show');
-				return 0;
-            			} else {
 
-
-            				$.ajax({
-					url: '/oficina/desambiguar',
-					dataType: 'json',
-					data: {
-						'graph' : $("#graph").val(),
-					           	'vd' : $("#vd").val(),
-					           	'nameArticle': $("#nameArticle").val(),
-					           	'rank': $("#rank").val(),
-					           	'conference': $("#conference").val(),
-					           	'year': $("#year").val(),
-					           	'levDist': $("#levDist").val()
-					           },
-					success : function($data) {
-						$('#aviso_titulo').html('Desambiguação Completa');
-            						$('#aviso_mensagem').html('Desambiguação feita com sucesso!');
-           			 			$('#aviso').modal('show');
-			            		},
-			            		error: function(xhr, ajaxOptions, thrownError) {
-					}
-				});
-            			}
+		if(validate() == 1 ){
+			$.ajax({
+				url: '/oficina/desambiguar',
+				dataType: 'json',
+				data: {
+					'graph' : $("#graph").val(),
+					'rules': $("#rules").val(),
+					'name_author': $("#name_author").val(),
+					'name_author_lev': $("#name_author_lev").val(),
+				           	'name_article': $('#name_article').val(),
+				           	'name_article_lev': $('#name_article_lev').val(),
+				           	'name_conference': $('#name_conference').val(),
+				           	'name_conference_lev': $('#name_conference_lev').val(),
+				           	'vd' : $("#vd").val(),
+				           	'rank': $("#rank").val(),
+				           	'year': $("#year").val(),
+				           	},
+				success : function($data) {
+					$('#aviso_titulo').html('Desambiguação Completa');
+        					$('#aviso_mensagem').html('Desambiguação feita com sucesso!');
+       			 		$('#aviso').modal('show');
+		            		},
+		            		error: function(xhr, ajaxOptions, thrownError) {
+				}
+			});
 		}
 	}
 
+	function validate(){
 
+		if($("#graph").val() == ''){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu um <b>grafo</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#rules").val().length > 1){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu um <b>critério</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#name_author").val().length  > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o peso para <b>nome do autor</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#name_author_lev").val() == ''){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o valor de Levesthein para o <b>nome do autor</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#name_article").val().length  > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o peso para <b>nome do artigo</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#name_article_lev").val() == ''){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o valor de Levesthein para o <b>nome do artigo</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
 
+		if($("#name_conference").val().length  > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o peso para <b>nome do conferência</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		if($("#name_conference_lev").val() == ''){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o valor de Levesthein para o <b>nome do conferência</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
+		console.log
+		if($("#year").val().length  > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o peso do <b>ano</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
 
+		if($("#rank").val().length > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu o peso para <b>ranking</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
 
-/*
+		if($("#vd").val().length > 2){
+			$('#aviso_titulo').html('Campos incompletos');
+            			$('#aviso_mensagem').html('Você não escolheu um peso para o <b>nível de desambiguação</b>.');
+           			 $('#aviso').modal('show');
+            			return 0;
+		}
 
-var query="PREFIX dc:       	<http://purl.org/dc/elements/1.1/> PREFIX bibo: 		<http://purl.org/ontology/bibo/> SELECT DISTINCT ?name ?person ?id FROM <http://peil.com> WHERE {?person bibo:identifier ?id . ?person dc:title ?name. }";
-var data=sparqlQuery(query, "http://localhost:8890/sparql/");
-
-function sparqlQuery(query, baseURL, format) {
-	if(!format) {
-		format="application/json";
+		return 1;
 	}
-
-	var params={
-		"default-graph": "", "should-sponge": "soft", "query": query,
-		"debug": "on", "timeout": "", "format": format,
-		"save": "display", "fname": ""
-	};
-
-	var querypart="";
-	for(var k in params) {
-		querypart+=k+"="+encodeURIComponent(params[k])+"&";
-	}
-
-	var queryURL=baseURL + '?' + querypart;
-
-
-	  var xhr = createCORSRequest('GET', queryURL);
-	  if (!xhr) {
-	    alert('CORS not supported');
-	    return;
-	  }
-
-	  // Response handlers.
-	  xhr.onload = function() {
-	    var text = xhr.responseText;
-	    var title = getTitle(text);
-	    alert('Response from CORS request to ' + url + ': ' + title);
-	  };
-
-	  xhr.onerror = function() {
-	    alert('Woops, there was an error making the request.');
-	  };
-
-	  xhr.send();
-
-
-  	return JSON.parse(xhr.responseText);
-
-}
-
-
-
-
-
-// Create the XHR object.
-function createCORSRequest(method, url) {
-  var xhr = new XMLHttpRequest();
-  if ("withCredentials" in xhr) {
-    // XHR for Chrome/Firefox/Opera/Safari.
-    xhr.open(method, url, true);
-  } else if (typeof XDomainRequest != "undefined") {
-    // XDomainRequest for IE.
-    xhr = new XDomainRequest();
-    xhr.open(method, url);
-  } else {
-    // CORS not supported.
-    xhr = null;
-  }
-  return xhr;
-}
-*/
 
 </script>

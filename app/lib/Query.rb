@@ -1,72 +1,40 @@
 class Query
 
-	def selectCoauthors (graph)
-
+	def selectArticles(graph)
 		graph = graph.gsub(' ', '')
 		query = "
-			SELECT DISTINCT  ?refBy ?article (xsd:integer(?rank)) as ?rank ?nameReal ?nameRight ?nameArticle ?nameConference ?year ?nodeAuthor2
-				FROM <"+graph+">
-				WHERE{
-				 ?article a bibo:AcademicArticle .
-				 ?article dc:title ?nameArticle .
-				 ?article dcterms:isReferencedBy ?refBy .
-				 ?article vivo:relatedBy ?nodeAuthor .
-				 ?article dcterms:issued ?year .
-				 ?article bibo:presentedAt ?conference .
-				 ?conference dc:title ?nameConference .
+			SELECT DISTINCT ?refBy ?article ?nameArticle ?nameConference ?year
+			FROM <"+graph+">
+			WHERE {
+			    ?article a bibo:AcademicArticle .
+			    ?article dcterms:issued ?year .
+			    ?article dc:title ?nameArticle .
+			    ?article bibo:presentedAt ?conference .
+			    ?article dcterms:isReferencedBy ?refBy .
+			    ?conference dc:title ?nameConference .
 
-				 ?nodeAuthor vivo:relates ?nodeAuthor2 .
-				 ?nodeAuthor vivo:rank ?rank .
-				 ?nodeAuthor2 rdfs:label ?nameRight .
-
-				 ?refBy bibo:identifier ?id .
-				 ?refBy dc:creator ?personCreator .
-				 ?personCreator rdfs:label ?nameWrong .
-				 ?personCreator obo:ARG_2000028 ?nodeName .
-				 ?nodeName vcard:hasName ?nameName .
-				 ?nameName vcard:fn ?nameReal .
-
-				 FILTER (!regex(str(?nodeAuthor2), concat(\"#author-\",str(?id)))) .
-				 FILTER (str(?nameReal) = str(?nameWrong))
-			} ORDER BY ?refBy ?nameArticle ?rank"
-
-		first, *rest = query.split(/FROM/) 		# pega os campos dinamicamente
-		cont = first.scan("?").count-1
-		coAuthors = Hash.new
-		coAuthors["query"] = query
-		coAuthors["cont"] = cont
-		return coAuthors
+			} ORDER BY ?refBy ?article"
+		return query
 	end
 
 	def selectAuthors (graph)
 		graph = graph.gsub(' ', '')
 		query = "
-			SELECT DISTINCT  ?refBy ?article (xsd:integer(?rank)) as ?rank ?nameReal ?nameRight ?nameArticle ?nameConference ?year ?nodeAuthor2
-					FROM <"+graph+">
-					WHERE {
-					 ?article a bibo:AcademicArticle .
-					 ?article dc:title ?nameArticle .
-					 ?article dcterms:isReferencedBy ?refBy .
-					 ?article vivo:relatedBy ?nodeAuthor .
-					 ?article dcterms:issued ?year .
-					 ?article bibo:presentedAt ?conference .
-					 ?conference dc:title ?nameConference .
+			SELECT ?refBy ?article ?nodeAuthor2 ?name (xsd:integer(?rank)) as ?rank ?nameArticle ?nameConference ?year
+			FROM <"+graph+">
+			WHERE {
+			    ?article a bibo:AcademicArticle .
+			    ?article dcterms:issued ?year .
+			    ?article dc:title ?nameArticle .
+			    ?article vivo:relatedBy ?nodeAuthor .
+			    ?article bibo:presentedAt ?conference .
+			    ?article dcterms:isReferencedBy ?refBy .
+			    ?conference dc:title ?nameConference .
+			    ?nodeAuthor vivo:relates ?nodeAuthor2 .
+			    ?nodeAuthor vivo:rank ?rank .
+			    ?nodeAuthor2 rdfs:label ?name .
 
-					 ?nodeAuthor vivo:relates ?nodeAuthor2 .
-					 ?nodeAuthor vivo:rank ?rank .
-					 ?nodeAuthor2 rdfs:label ?nameRight .
-
-					 ?refBy bibo:identifier ?id .
-					 ?refBy dc:creator ?personCreator .
-					 ?personCreator rdfs:label ?nameWrong .
-					 ?personCreator obo:ARG_2000028 ?nodeName .
-					 ?nodeName vcard:hasName ?nameName .
-					 ?nameName vcard:fn ?nameReal .
-
-					 FILTER (regex(str(?nodeAuthor2), concat(\"#author-\",str(?id)))) .
-					 FILTER (str(?nameReal) = str(?nameWrong))
-	                                 		 FILTER (str(?nameReal) = str(?nameRight))
-			} ORDER BY ?refBy ?nameArticle ?rank"
+			} ORDER BY ?refBy ?article ?rank"
 
 		first, *rest = query.split(/FROM/) 		# pega os campos dinamicamente
 		cont = first.scan("?").count-1
@@ -74,6 +42,69 @@ class Query
 		authors["query"] = query
 		authors["cont"] = cont
 		return authors
+	end
+
+	def selectProfiles (graph)
+		graph = graph.gsub(' ', '')
+		queryGivenName = "
+			SELECT DISTINCT ?refBy ?givenName
+				FROM <"+graph+">
+				WHERE {
+				    ?refBy bibo:identifier ?id .
+				    ?refBy dc:creator ?personCreator .
+				    ?personCreator obo:ARG_2000028 ?nodeName .
+				    ?nodeName vcard:hasName ?nameName .
+				    ?nameName vcard:givenName ?givenName .
+
+				    FILTER (regex(str(?nodeName), str(\"#i\"))).
+				}"
+
+		queryFamilyName = "
+			SELECT DISTINCT ?refBy ?familyName
+			FROM <"+graph+">
+			WHERE {
+			    ?refBy bibo:identifier ?id .
+			    ?refBy dc:creator ?personCreator .
+			    ?personCreator obo:ARG_2000028 ?nodeName .
+			    ?nodeName vcard:hasName ?nameName .
+			    ?nameName vcard:familyName ?familyName .
+
+			    FILTER (regex(str(?nodeName), str(\"#i\"))).
+			}"
+
+		queryProfileName = "
+			SELECT DISTINCT ?refBy ?realName
+			FROM <"+graph+">
+			WHERE {
+			    ?refBy bibo:identifier ?id .
+			    ?refBy dc:creator ?personCreator .
+			    ?personCreator obo:ARG_2000028 ?nodeName .
+			    ?nodeName vcard:hasName ?nameName .
+			    ?nameName vcard:fn ?realName .
+			}"
+
+		profiles = Hash.new
+		profiles["queryGivenName"] = queryGivenName
+		profiles["queryFamilyName"] = queryFamilyName
+		profiles["queryProfileName"] = queryProfileName
+
+		return profiles
+	end
+
+	def getProfiles(graph, name)
+		queryProfileName = "
+			SELECT DISTINCT ?refBy ?realName
+			FROM <"+graph+">
+			WHERE {
+			    ?refBy bibo:identifier ?id .
+			    ?refBy dc:creator ?personCreator .
+			    ?personCreator obo:ARG_2000028 ?nodeName .
+			    ?nodeName vcard:hasName ?nameName .
+			    ?nameName vcard:fn ?realName .
+			    FILTER (regex(str(?realName), str(\"#{name}\"))).
+			}"
+
+		return queryProfileName
 	end
 
 	def insert (graph, triples)
