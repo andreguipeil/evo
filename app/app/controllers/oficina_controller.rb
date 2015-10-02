@@ -40,6 +40,7 @@ respond_to :html, :json, :js
 		values['conference'] = params[:conference]
 		values['year'] = params[:year]
 		values['levDist'] = params[:levDist]
+		arq = FileArray.new
 
 
 		graphArq = graph.gsub('.com', '')
@@ -51,7 +52,7 @@ respond_to :html, :json, :js
 		graphArq = graphArq.gsub('.edu', '')
 
 
-		if(File.exist?(graphArq+".txt") != true) then
+		#if(File.exist?(graphArq+".txt") != true) then
 
 			# =========
 			# STEP 1 - importing RDF data information
@@ -59,51 +60,65 @@ respond_to :html, :json, :js
 			query = Query.new
 			dataProfiles  = query.selectProfiles(graph)
 			dataAuthors = query.selectAuthors(graph)
+			queryArticles = query.selectArticles(graph)
 
 			c = ConnectionSPARQL.new
 			dataName  = c.runQuery(dataProfiles["queryProfileName"])
 			dataGiven  = c.runQuery(dataProfiles["queryGivenName"])
 			dataFamily = c.runQuery(dataProfiles["queryFamilyName"])
 
-
+			dataArticles = c.runQuery(queryArticles)
 			# =========
 			# STEP 2 - normalization of names and articles
 			# =========
+
 			parse =  Normalize.new
 			profiles = parse.normalizeProfiles(dataName, dataGiven, dataFamily, 0)
 			tempAuthors = c.runQuery(dataAuthors['query'])
-			logger.info dataAuthors['cont']
 			authors = parse.csvToArray(tempAuthors, dataAuthors['cont'])
 
+			articles  = parse.normalizeArticles(dataArticles)
+
+			#logger.info articles
 			# =========
 			# STEP 3 - create similar articles block's
 			# =========
 
 			entities = Entity.new						#
-			semanticBlock = entities.createEntities(authors)		# cria os blocos semânticos com a distancia de leivinstein
+			#semanticBlock = entities.createEntities(authors)		# cria os blocos semânticos com a distancia de leivinstein
+			#entities.clusterizationByName(authors, profiles)
+			entities.clusterizationByArticle(authors, articles)
+			# =========
+			# STEP 4 - load info quickly
+			# =========
+
+			#arq.createArq(semanticBlock, graphArq+'.txt')		# cria arquivo e insere os blocos semanticos
+			#authorsTemp = arq.readArq(graphArq+'.txt')			# carrega os blocos semanticos
+			#arq.createArqProfiles(profiles, graphArq+'-profiles.txt')
+			#profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
+		#else
 
 			# =========
 			# STEP 4 - load info quickly
 			# =========
-			arq = FileArray.new
-			arq.createArq(semanticBlock, graphArq+'.txt')		# cria arquivo e insere os blocos semanticos
-			authorsTemp = arq.readArq(graphArq+'.txt')			# carrega os blocos semanticos
-			arq.createArqProfiles(profiles, graphArq+'-profiles.txt')
-			profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
-		else
+			#authorsTemp = arq.readArq(graphArq+'.txt')			# carrega os blocos semanticos
+			#profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
+		#end
+		#config = Hash.new
+		#config['vd'] = params[:vd]
+		#config['nameArticle'] = params[:nameArticle]
+		#config['conference'] = params[:conference]
+		#config['rank'] = params[:rank]
+		#config['year'] = params[:year]
+		#config['levDist'] = params[:levDist]
 
-			# =========
-			# STEP 4 - load info quickly
-			# =========
-			arq = FileArray.new
-			authorsTemp = arq.readArq(graphArq+'.txt')			# carrega os blocos semanticos
-			profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
-		end
+		#arq.createArqConfig(config, graphArq+"-config.txt")
+
 		# =========
 		# STEP 5 - Desambiguation
 		# =========
-		des = Desambiguation.new
-		entitySames = des.desambiguationEntities(authorsTemp, values)	# faz os casamentos dos semelhantes
+		#des = Desambiguation.new
+		#entitySames = des.desambiguationEntities(authorsTemp, values)	# faz os casamentos dos semelhantes
 		#triples = des.createTriples(entitySames, graphArq+'.nt')		#cria as triplas em um arquivo .nt
 
 		# =========
@@ -128,7 +143,9 @@ respond_to :html, :json, :js
 		data = c.runQuery(query)
 
 		arq = FileArray.new
+
 		logger.info graph
+
 		graphArq = graph.gsub('.com', '')
 		graphArq = graphArq.gsub('http://', '')
 		graphArq = graphArq.gsub('www.', '')
@@ -138,6 +155,9 @@ respond_to :html, :json, :js
 		graphArq = graphArq.gsub('.edu', '')
 		profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
 		contPesquisadores = profilesTemp.size
+		config = arq.readArqConfig(graphArq+"-config.txt")
+		logger.info config
+
 
 		@send = Hash.new
 		@send['graph'] = graph

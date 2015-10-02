@@ -90,19 +90,19 @@ $KCODE = 'UTF8'
 			article = article.gsub('-seus-', '-')
 			article = article.gsub('-seu-', '-')
 
-			if  article[0].chr == 'a' and article[1].chr == '-'
-				article = article.gsub("a-", '')
-			end
-			if article[0].chr == 'o' and article[1].chr == '-'
-				article = article.gsub("o-", '')
-			end
+			#if  article[0].chr == 'a' and article[1].chr == '-'
+			#	article = article.gsub("a-", '')
+			#end
+			#if article[0].chr == 'o' and article[1].chr == '-'
+			#	article = article.gsub("o-", '')
+			#end
 
-			if article[0].chr == 'o' and article[1].chr == 's' and article[2].chr == '-'
-				article = article.gsub("os-", '')
-			end
-			if article[0].chr == 'a' and article[1].chr == 's' and article[2].chr == '-'
-				article = article.gsub("as-", '')
-			end
+			#if article[0].chr == 'o' and article[1].chr == 's' and article[2].chr == '-'
+			#	article = article.gsub("os-", '')
+			#end
+			#if article[0].chr == 'a' and article[1].chr == 's' and article[2].chr == '-'
+			#	article = article.gsub("as-", '')
+			# end
 		return article
 	end
 
@@ -147,6 +147,7 @@ $KCODE = 'UTF8'
 				profile = Hash.new
 				profile['refBy'] = row[0].encode("ASCII-8BIT").force_encoding("utf-8")
 				profile['name'] = row[1].encode("ASCII-8BIT").force_encoding("utf-8")
+				profile['nameNormalized'] = row[1].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
 				profile['givenName'] = Array.new
 				dataGivenName.each do | a |
 					if a[0] == profile['refBy'] then
@@ -172,6 +173,32 @@ $KCODE = 'UTF8'
 			Rails.logger.info "Erro no case"
 		end
 		return profiles
+	end
+
+#######################################################
+# organiza todos os perfis do grafo
+# --> Entrada: Array em CSV
+# --> Saida: Array
+#######################################################
+	def normalizeArticles (dataArticles)
+
+		articles  = Array.new
+		dataArticles.shift			# retira o primeiro elemento que é o cabecalho
+
+		Rails.logger.info dataArticles
+		dataArticles.each do | art |
+			article = Hash.new
+			article['refBy'] = art[0].encode("ASCII-8BIT").force_encoding("utf-8")
+			article['refByArticle'] = art[1].encode("ASCII-8BIT").force_encoding("utf-8")
+			art[2] = art[2].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
+			art[2] = retireConectives(art[2])
+			article['articleNormalized'] = art[2]
+			article['conference'] = art[3].encode("ASCII-8BIT").force_encoding("utf-8")
+			article['year'] = art[4].encode("ASCII-8BIT").force_encoding("utf-8")
+			articles.push(article)
+		end
+
+		return articles
 	end
 
 end

@@ -42,6 +42,10 @@ class Desambiguation
 			indexA = 0
 			entityA.each do | a |
 				indexB = 0
+				Rails.logger.info "===================================================="
+				Rails.logger.info "DESAMBIGUANDO ENTIDADE"
+				Rails.logger.info " "+a[5]
+				Rails.logger.info "===================================================="
 				entityB.each do | b |
 					if(a[0] != b[0]) then
 						nivel1 = nivel1+1
@@ -57,8 +61,10 @@ class Desambiguation
 							nivel2 = nivel2+1
 							if distance != nil then
 								Rails.logger.info "======================="
-								Rails.logger.info a
-								Rails.logger.info b
+								Rails.logger.info a[3]
+								Rails.logger.info b[3]
+								Rails.logger.info a[2]
+								Rails.logger.info b[2]
 								vd = 0
 								# name article == name article
 								if(a[5] == b[5]) then
@@ -180,6 +186,8 @@ class Desambiguation
 		triples = []
 
 		vector.each do | same |
+
+			Rails.logger.info same
 			if(same.empty? == false) then
 				temp = RDF::Graph.new
 

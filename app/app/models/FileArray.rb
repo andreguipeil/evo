@@ -90,6 +90,36 @@ class FileArray
 	end
 
 #######################################################
+# Cria um arquivo com os dados da configuracao
+# --> Entrada: nome, configuracoes
+# --> Saida: object
+#######################################################
+
+	def createArqConfig (config, arq)
+		File.open(arq, 'w') do |f2|
+ 			f2.puts config
+ 		end
+	end
+
+#######################################################
+# Lê arquivo contendo as configuracoes
+# --> Entrada: nome do arquivo
+# --> Saida: hash com as configuracoes
+#######################################################
+
+
+	def readArqConfig (arq)
+		config = Hash.new
+		IO.readlines(arq).each do | line |
+			if (line != "\n")
+				config = eval(line)
+			end
+		end
+		return config
+	end
+
+
+#######################################################
 # Função que insere um log no arquivo
 # --> Entrada: nome do arquivo e o conteudo
 # --> Saida: true or false

@@ -47,7 +47,6 @@ class ConnectionSPARQL
 			    #{prefix19}"
 
 		sparql=prefixes+query
-
 		params={
 			"default-graph" => "",
 			"should-sponge" => "soft",
@@ -63,8 +62,6 @@ class ConnectionSPARQL
 			querypart+="#{k}=#{CGI.escape(v)}&"
 		}
 		sparqlURL=baseURL+"?#{querypart}"
-
-		Rails.logger.info sparqlURL
 
 		response = Net::HTTP.get_response(URI.parse(sparqlURL))
 
@@ -132,8 +129,6 @@ class ConnectionSPARQL
 			querypart+="#{k}=#{CGI.escape(v)}&"
 		}
 		sparqlURL=baseURL+"?#{querypart}"
-
-		Rails.logger.info sparqlURL
 
 		response = Net::HTTP.get_response(URI.parse(sparqlURL))
 
