@@ -107,13 +107,22 @@ respond_to :html, :json, :js
 			when '3' then
 				clusters = entities.clusterizationByArticleYear(authors, values['name_article_lev'].to_f)
 			end
-
-
-
+			# =========
+			# STEP 4 - load info quickly
+			# =========
+			arq.createArq(clusters, graphArq+'.txt')						# cria arquivo e insere os blocos semanticos
+			authorsTemp = arq.readArq(graphArq+'.txt')					# carrega os blocos semanticos
+			arq.createArqProfiles(profiles, graphArq+'-profiles.txt')
+			profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
 		else
-
+			# =========
+			# STEP 4 - load info quickly
+			# =========
+			authorsTemp = arq.readArq(graphArq+'.txt')					# carrega os blocos semanticos
+			profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
 		end
 
+		arq.createArqConfig(values, graphArq+"-config.txt")
 
 
 		respond_with(@ret)

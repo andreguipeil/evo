@@ -27,11 +27,12 @@ class Entity
 				end
 			}
 		end
+		entities = Array.new
 
 		entityName.each {  | key, value |
-			Rails.logger.info key.to_s+" "+value.size.to_s
+			entities.push(value)
 		}
-		#return entityName
+		return entities
 	end
 
 

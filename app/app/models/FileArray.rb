@@ -96,7 +96,7 @@ class FileArray
 #######################################################
 
 	def createArqConfig (config, arq)
-		File.open(arq, 'w') do |f2|
+		File.open(arq, 'a+') do |f2|
  			f2.puts config
  		end
 	end
