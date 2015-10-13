@@ -137,41 +137,22 @@ respond_to :html, :json, :js
 		case values['rules']
 		when '1' then
 			entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
-			entitySames.each do | same |
-				logger.info " "
-				logger.info "ENTIDADE ======"
-				logger.info " "
-				same.each do | s |
-					logger.info  s[2].to_s+" "+s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1]['refBy'] +" "+ s[1]['refByArticle']+" "+ s[1]['articleNormalized']
-				end
-			end
 
 		when '2' then
 			entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-			entitySames.each do | same |
-				logger.info " "
-				logger.info "ENTIDADE ======"
-				logger.info " "
-				same.each do | s |
-					logger.info  s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1][2] +" "+ s[1][3] +" "+ s[1][1]+" "+ s[1][5]
-				end
-			end
 
 		when '3' then
 			entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-			entitySames.each do | same |
-				logger.info " "
-				logger.info "ENTIDADE ======"
-				logger.info " "
-				same.each do | s |
-					logger.info  s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1][2] +" "+ s[1][3] +" "+ s[1][1]+" "+ s[1][5]
-				end
-			end
 		end
 
-
-
-
+		entitySames.each do | same |
+			logger.info " "
+			logger.info "ENTIDADE ======"
+			logger.info " "
+			same.each do | s |
+				logger.info  s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1][2] +" "+ s[1][3] +" "+ s[1][1]+" "+ s[1][5]
+			end
+		end
 
 
 		# =========

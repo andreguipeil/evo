@@ -55,20 +55,37 @@ class Disambiguation
 							artCurr.each do | art |
 								distanceNameArticle = Levenshtein.normalized_distance(a[5], art['articleNormalized'], valueNameArticleLev) 		# verifica a distancia do author
 								if(distanceNameArticle != nil) then
+									b = Hash.new
+									b[0] = art['refBy']
+									b[1] = art['refByArticle']
+									b[2] = art['refByAuthor']
+									b[3] = art['name']
+									b[4] = art['rank']
+									b[5] = art['articleNormalized']
+									b[6] = art['conferenceNormalized']
+									b[7] = art['year']
+
 									vd += valueNameAuthor 	# conta o valor do autor
 									vd += valueNameArticle
-									distanceNameConference = Levenshtein.normalized_distance(a[6], art['conferenceNormalized'], valueNameConferenceLev) # verifica a distancia do author
+
+									# rank == rank
+									if (a[4] == b[4]) then
+										vd += valueRank
+									end
+
+									distanceNameConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
 									if distanceNameConference != nil then
 										vd += valueNameConference
 									end
 
 									# year == year
-									if(a[7] == art['year']) then
+									if(a[7] == b[7]) then
 										vd += valueYear
 									end
+
 									same = Hash.new
 									same[0] = a
-									same[1] = art
+									same[1] = b
 									same[2] = vd
 									sames.push(same)
 									vd = 0
