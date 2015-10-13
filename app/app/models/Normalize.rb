@@ -194,6 +194,9 @@ $KCODE = 'UTF8'
 			art[2] = retireConectives(art[2])
 			article['articleNormalized'] = art[2]
 			article['conference'] = art[3].encode("ASCII-8BIT").force_encoding("utf-8")
+			art[3] = art[3].encode("ASCII-8BIT").force_encoding("utf-8").parameterize.to_s
+			art[3] = retireConectives(art[3])
+			article['conferenceNormalized'] = art[3]
 			article['year'] = art[4].encode("ASCII-8BIT").force_encoding("utf-8")
 			articles.push(article)
 		end

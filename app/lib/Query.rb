@@ -3,7 +3,7 @@ class Query
 	def selectArticles(graph)
 		graph = graph.gsub(' ', '')
 		query = "
-			SELECT DISTINCT ?refBy ?article ?nameArticle ?nameConference ?year
+			SELECT DISTINCT ?refBy ?article ?nameArticle ?nameConference ?year ?nodeAuthor2 (xsd:integer(?rank)) as ?rank
 			FROM <"+graph+">
 			WHERE {
 			    ?article a bibo:AcademicArticle .
@@ -12,6 +12,10 @@ class Query
 			    ?article bibo:presentedAt ?conference .
 			    ?article dcterms:isReferencedBy ?refBy .
 			    ?conference dc:title ?nameConference .
+                            	    ?article vivo:relatedBy ?nodeAuthor .
+                            	    ?nodeAuthor vivo:relates ?nodeAuthor2 .
+                            	    ?nodeAuthor vivo:rank ?rank .
+                            	FILTER (!regex(str(?nodeAuthor2), str(\"-i\"))).
 
 			} ORDER BY ?refBy ?article"
 		return query

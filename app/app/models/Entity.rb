@@ -1,6 +1,30 @@
 class Entity
 
 #######################################################
+# Cria cluster de artigos
+# --> Entrada: array of triples
+# --> Saida: array of peoples
+#######################################################
+	def clusterizationByRefBy(articles, profiles)
+		Rails.logger.info "aqui na clusterização"
+		Rails.logger.info articles
+
+		entityRefBy  = Hash.new 											# varre os profiles para pegar todas as pessoas que serao desambiguadas
+		profiles.each do | row |
+			entityRefBy[row['refBy']] = Array.new
+		end
+
+		articles.each do | art |
+			entityRefBy.each { | key, value |
+				if( key == art['refBy']) then
+					entityRefBy[key].push(art)
+				end
+			}
+		end
+		return entityRefBy
+	end
+
+#######################################################
 # Cria cluster de autores
 # --> Entrada: array of triples
 # --> Saida: array of peoples

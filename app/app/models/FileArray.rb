@@ -61,6 +61,39 @@ class FileArray
 # --> Saida: object
 #######################################################
 
+	def createArqArticles (articles, arq)
+		Rails.logger.info "aqui no articles"
+		Rails.logger.info articles
+		File.open(arq, 'w') do | f2 |
+ 			f2.puts articles
+ 		end
+	end
+
+#######################################################
+# Lê arquivo contendo os blocos dos articles
+# --> Entrada: nome do arquivo
+# --> Saida: array de profiles
+#######################################################
+
+
+	def readArqArticles (arq)
+		articles = Array.new
+		IO.readlines(arq).each do | line |
+			if (line != "\n")
+				hash = eval(line)
+				articles.push(hash)
+			end
+		end
+		return articles
+	end
+
+
+#######################################################
+# Cria um arquivo representando a blocagem dos artigos
+# --> Entrada: array of articles, name file
+# --> Saida: object
+#######################################################
+
 	def createArqProfiles (profiles, arq)
 		File.open(arq, 'w') do |f2|
  			profiles.each do | pro |
