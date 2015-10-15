@@ -95,6 +95,7 @@ respond_to :html, :json, :js
 			# STEP 2 - normalization of names and articles
 			# =========
 			parse =  Normalize.new
+			logger.info "Normalizing..."
 			articles = parse.normalizeArticles(tempArticles)
 			profiles = parse.normalizeProfiles(dataName, dataGiven, dataFamily, 0)
 			authors = parse.csvToArray(tempAuthors, dataAuthors['cont'])
@@ -123,36 +124,33 @@ respond_to :html, :json, :js
 		profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
 		articlesTemp = arq.readArqArticles(graphArq+'-articles.txt')
 		arq.createArqConfig(values, graphArq+"-config.txt")
-		logger.info articlesTemp
+		#logger.info articlesTemp
+
 		# =========
 		# STEP 5 - Desambiguation
 		# =========
 		dis = Disambiguation.new
-
-		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
-
-		logger.info "=========================="
-		logger.info "============="
-
 		case values['rules']
 		when '1' then
 			entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
 
 		when '2' then
-			entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-
+			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
+			entitySames = dis.disambiguationByArticleYearWithOthers(authorsTemp, values)
 		when '3' then
-			entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
+			entitySames = dis.disambiguationByArticleYearWithOthers(authorsTemp, values)
+			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
+		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 
-		entitySames.each do | same |
-			logger.info " "
-			logger.info "ENTIDADE ======"
-			logger.info " "
-			same.each do | s |
-				logger.info  s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1][2] +" "+ s[1][3] +" "+ s[1][1]+" "+ s[1][5]
-			end
-		end
+		#entitySames.each do | same |
+		#	logger.info " "
+		#	logger.info "ENTIDADE ======"
+		#	logger.info " "
+		#	same.each do | s |
+		#		logger.info  s[0][3]+" "+s[0][2] +" "+ s[0][1] +" "+ s[0][5]+" <=>"+ s[1][2] +" "+ s[1][3] +" "+ s[1][1]+" "+ s[1][5]
+		#	end
+		#end
 
 
 		# =========
@@ -162,8 +160,8 @@ respond_to :html, :json, :js
 		#conn = ConnectionSPARQL.new
 		#triples.each do | trip |
 		#	logger.info trip
-			#q = query.insert(graph, trip)
-			#data = conn.runInsert(q)
+		#	q = query.insert(graph, trip)
+		#	data = conn.runInsert(q)
 		#end
 
 

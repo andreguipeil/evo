@@ -6,8 +6,9 @@ class Entity
 # --> Saida: array of peoples
 #######################################################
 	def clusterizationByRefBy(articles, profiles)
-		Rails.logger.info "aqui na clusterização"
-		Rails.logger.info articles
+		#Rails.logger.info "aqui na clusterização"
+		#Rails.logger.info articles
+		Rails.logger.info "Clusterization refBy"
 
 		entityRefBy  = Hash.new 											# varre os profiles para pegar todas as pessoas que serao desambiguadas
 		profiles.each do | row |
@@ -31,10 +32,10 @@ class Entity
 #######################################################
 
 	def clusterizationByName(authors, lev, profiles)
-		Rails.logger.info authors
-		Rails.logger.info profiles
-		Rails.logger.info lev
-
+		#Rails.logger.info authors
+		#Rails.logger.info profiles
+		#Rails.logger.info lev
+		Rails.logger.info "Clusterization"
 		entityName  = Hash.new 											# varre os profiles para pegar todas as pessoas que serao desambiguadas
 		profiles.each do | row |
 			entityName[row['nameNormalized']] = Array.new
@@ -45,11 +46,12 @@ class Entity
 				distance = Levenshtein.normalized_distance(key,row[3], lev)
 				if distance != nil then
 					if distance <= lev.to_f then								# verifica a distancia se bater adiciona
-						Rails.logger.info distance.to_s+" entre :"+key.to_s+" "+row[3].to_s		# distancia de levenshtein em 0.2 para artigos aproximados
+						#Rails.logger.info distance.to_s+" entre :"+key.to_s+" "+row[3].to_s		# distancia de levenshtein em 0.2 para artigos aproximados
 						entityName[key].push(row)
 					end
 				end
 			}
+			Rails.logger.info row[3]
 		end
 		entities = Array.new
 
@@ -71,7 +73,7 @@ class Entity
 		est = Hash.new				# cria uma hash para declarar os dados estaticos atraves de nome
 		est['numero_triplas'] = triples.size	# faz a conta do numero de triplas que vem do banco
 		contClusterizacao = 0
-
+		Rails.logger.info "Clusterization by Article"
 		entities = Array.new
 		sideA 	= triples.dup 			# duplica por copia
 		sideB 	= triples.dup 			# duplica por copia
@@ -128,6 +130,7 @@ class Entity
 			entityYear[row[7]].push(row)
 		end
 
+		Rails.logger.info "Clusterization by Article/Year"
 		entities = Array.new
 		contClusterizacao = 0;
 		entityYear.each { | year, array |					# percorre as entidades por ano, cara entidade possui um x de autores

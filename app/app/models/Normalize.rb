@@ -185,7 +185,7 @@ $KCODE = 'UTF8'
 		articles  = Array.new
 		dataArticles.shift			# retira o primeiro elemento que é o cabecalho
 
-		Rails.logger.info dataArticles
+		#Rails.logger.info dataArticles
 		dataArticles.each do | art |
 			article = Hash.new
 			article['refBy'] = art[0].encode("ASCII-8BIT").force_encoding("utf-8")
