@@ -265,9 +265,9 @@ class Disambiguation
 		triples = []
 
 		entitiesSames.each do | entity |
-			Rails.logger.info entity
+			#Rails.logger.info entity
 			entity.each do | same |
-				Rails.logger.info same
+				#Rails.logger.info same
 				if(same.empty? == false) then
 					temp = RDF::Graph.new
 
@@ -277,9 +277,9 @@ class Disambiguation
 					graph << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
 					graph << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[2]]
 					graph << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					graph << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
+					#graph << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
 					graph << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					graph << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
+					#graph << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
 
 
 					temp << [disambiguation.pair+"#has_dis-"+id, RDF.type, disambiguation.pair]
@@ -287,9 +287,9 @@ class Disambiguation
 					temp << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
 					temp << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[2]]
 					temp << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					temp << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
+					#temp << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
 					temp << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					temp << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
+					#temp << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
 
 				triples[cont] = temp.dump(:ntriples)
 				cont = cont+1
@@ -360,6 +360,7 @@ class Disambiguation
 							nivel2 = nivel2+1
 							vd = 0
 							if distance != nil then
+								vd += valueNameAuthor 	# conta o valor do autor
 								#Rails.logger.info "======================="
 								#Rails.logger.info a[3]
 								#Rails.logger.info b[3]

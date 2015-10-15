@@ -64,9 +64,9 @@ respond_to :html, :json, :js
 			when '1' then
 				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
 			when '3' then
-				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
 		end
 
 		if(File.exist?(graphArq+".txt") != true) then
@@ -138,10 +138,11 @@ respond_to :html, :json, :js
 			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 			entitySames = dis.disambiguationByArticleYearWithOthers(authorsTemp, values)
 		when '3' then
-			entitySames = dis.disambiguationByArticleYearWithOthers(authorsTemp, values)
-			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
+			#entitySames = dis.disambiguationByArticleYearWithOthers(authorsTemp, values)
+			entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
 		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
+		#tri = arq.readArqTriples(graphArq+'.nt')
 
 		#entitySames.each do | same |
 		#	logger.info " "
@@ -164,8 +165,100 @@ respond_to :html, :json, :js
 		#	data = conn.runInsert(q)
 		#end
 
+		# =========
+		# STEP 6 - Store Triples
+		# =========
+		#query = Query.new
+		#conn = ConnectionSPARQL.new
+		#tri.each do | t |
+		#	logger.info t
+		#	q = query.delete(graph, t)
+		#	data = conn.runDelete(q)
+		#end
+
 
 		respond_with(@ret)
+	end
+
+	def insertTriples
+		graph = params[:graph]
+		arq = FileArray.new
+		graphArq = graph.gsub('.com', '')
+		graphArq = graphArq.gsub('http://', '')
+		graphArq = graphArq.gsub('www.', '')
+		graphArq = graphArq.gsub('.br', '')
+		graphArq = graphArq.gsub('.org', '')
+		graphArq = graphArq.gsub('.net', '')
+		graphArq = graphArq.gsub('.edu', '')
+
+		# nome do arquivo ==> grafo+criterio+leveinstein.txt
+		# criterio: 1 -> nome do autor
+		# criterio: 2 -> nome do artigo
+		# criterio: 3 -> nome do artigo + ano
+		case params[:rules]
+			when '1' then
+				graphArq = graphArq+params[:rules]+params[:name_author_lev].to_s.gsub('.', '')
+			when '2' then
+				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+			when '3' then
+				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+		end
+
+		tri = arq.readArqTriples(graphArq+'.nt')
+
+		# =========
+		# STEP 6 - Store Triples
+		# =========
+		query = Query.new
+		conn = ConnectionSPARQL.new
+		tri.each do | trip |
+			logger.info "inserindo "+trip
+			q = query.insert(graph, trip)
+			data = conn.runInsert(q)
+		end
+
+		respond_with(ret = true)
+	end
+
+	def deleteTriples
+		graph = params[:graph]
+		arq = FileArray.new
+		graphArq = graph.gsub('.com', '')
+		graphArq = graphArq.gsub('http://', '')
+		graphArq = graphArq.gsub('www.', '')
+		graphArq = graphArq.gsub('.br', '')
+		graphArq = graphArq.gsub('.org', '')
+		graphArq = graphArq.gsub('.net', '')
+		graphArq = graphArq.gsub('.edu', '')
+
+		# nome do arquivo ==> grafo+criterio+leveinstein.txt
+		# criterio: 1 -> nome do autor
+		# criterio: 2 -> nome do artigo
+		# criterio: 3 -> nome do artigo + ano
+		case params[:rules]
+			when '1' then
+				graphArq = graphArq+params[:rules]+params[:name_author_lev].to_s.gsub('.', '')
+			when '2' then
+				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+			when '3' then
+				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+		end
+
+		tri = arq.readArqTriples(graphArq+'.nt')
+
+
+		# =========
+		# STEP 6 - Store Triples
+		# =========
+		query = Query.new
+		conn = ConnectionSPARQL.new
+		tri.each do | t |
+			logger.info "deletando "+t
+			q = query.delete(graph, t)
+			data = conn.runDelete(q)
+		end
+
+		respond_with(ret = true)
 	end
 
 	def navigation

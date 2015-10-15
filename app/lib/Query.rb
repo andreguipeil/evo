@@ -114,29 +114,15 @@ class Query
 
 	def insert (graph, triples)
 		ins = '
-		 INSERT DATA INTO GRAPH <'+graph+'> { '+triples+' }'
+		 	INSERT DATA INTO GRAPH <'+graph+'> { '+triples+' }'
 		return ins
 	end
 
-	def delete (graph)
+	def delete (graph, triples)
+		del = '
+			DELETE FROM <'+graph+'> {'+triples+'}'
+		return del
 	end
 
-	def navigation (graph)
-		graph = graph.gsub(' ', '')
-		nav = "
-		SELECT DISTINCT ?dis ?o ?name ?vd
-		FROM <"+graph+">
-		WHERE {
-
-		   ?dis pair:has_dis ?o .
-		   ?o pair:value_disambiguation ?vd .
-		   ?dis rdfs:label ?name .
-
-
-		   FILTER (str(?dis) != str(\"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261\"))
-		   FILTER (?vd > 3).
-		} order by ?o"
-		return nav
-	end
 
 end

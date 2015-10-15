@@ -250,7 +250,9 @@
 			<hr>
 			<div class="col-xs-12 text-center" style="margin-top:40px; margin-bottom:30px;">
 				<p class="help-block">Para desambiguar basta clicar, lembrando que este processo pode demorar um pouco.</p>
+				<button  class="btn btn-info" onclick="insertTriples()">Insert</button>
 				<button  class="btn btn-success" onclick="sendForm()">Desambiguar</button>
+				<button  class="btn btn-danger" onclick="deleteTriples()">Delete</button>
 			</div>
 		</div>
 	</div>
@@ -313,6 +315,53 @@
 	}
 
 
+	function insertTriples(){
+
+		if(validate() == 1 ){
+			$.ajax({
+				url: '/oficina/insertTriples',
+				dataType: 'json',
+				data: {
+					'graph' : $("#graph").val(),
+					'rules': $("#rules").val(),
+					'name_author_lev': $("#name_author_lev").val(),
+					'name_article_lev': $('#name_article_lev').val(),
+				           	'name_conference_lev': $('#name_conference_lev').val()
+				           	},
+				success : function($data) {
+					$('#aviso_titulo').html('Triplas Inseridas');
+        					$('#aviso_mensagem').html('Vá no virtuoso ver as triplas meu velho!');
+       			 		$('#aviso').modal('show');
+		            		},
+		            		error: function(xhr, ajaxOptions, thrownError) {
+				}
+			});
+		}
+	}
+
+	function deleteTriples(){
+
+		if(validate() == 1 ){
+			$.ajax({
+				url: '/oficina/deleteTriples',
+				dataType: 'json',
+				data: {
+					'graph' : $("#graph").val(),
+					'rules': $("#rules").val(),
+					'name_author_lev': $("#name_author_lev").val(),
+					'name_article_lev': $('#name_article_lev').val(),
+				           	'name_conference_lev': $('#name_conference_lev').val()
+				           	},
+				success : function($data) {
+					$('#aviso_titulo').html('Triplas Inseridas');
+        					$('#aviso_mensagem').html('Vá no virtuoso ver as triplas meu velho!');
+       			 		$('#aviso').modal('show');
+		            		},
+		            		error: function(xhr, ajaxOptions, thrownError) {
+				}
+			});
+		}
+	}
 
 	function sendForm(){
 

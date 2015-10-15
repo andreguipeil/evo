@@ -135,6 +135,23 @@ class FileArray
 	end
 
 #######################################################
+# Lê arquivo contendo as triplas
+# --> Entrada: nome do arquivo
+# --> Saida: array de triplas
+#######################################################
+
+
+	def readArqTriples (arq)
+		triples = Array.new
+		IO.readlines(arq).each do | line |
+			if (line != "\n")
+				triples.push(line)
+			end
+		end
+		return triples
+	end
+
+#######################################################
 # Lê arquivo contendo as configuracoes
 # --> Entrada: nome do arquivo
 # --> Saida: hash com as configuracoes

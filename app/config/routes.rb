@@ -27,6 +27,8 @@ Rails.application.routes.draw do
 	resources :oficina do
 	     collection do
 	     	get 'desambiguar'
+	     	get 'insertTriples'
+	     	get 'deleteTriples'
 	     	get 'navigation'
 	     	get 'getProfiles'
 	     end
