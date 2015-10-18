@@ -134,7 +134,7 @@ $KCODE = 'UTF8'
 # --> Entrada: Array em CSV
 # --> Saida: Array
 #######################################################
-	def normalizeProfiles (dataName, dataFamilyName, dataGivenName, type)
+	def normalizeProfiles (dataName, dataGivenName, dataFamilyName, type)
 		profiles  = Array.new
 		dataName.shift			# retira o primeiro elemento que é o cabecalho
 		case type

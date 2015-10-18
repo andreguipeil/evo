@@ -83,7 +83,7 @@ class Entity
 			if(sideB.size > 0) then
 				ent 	  = Array.new
 				newSide = Array.new
-					sideB.each do |b|			# percorre b
+					sideB.each do |b|	# percorre b
 						# clusterizando por artigo
 						contClusterizacao = contClusterizacao+1
 						distance = Levenshtein.normalized_distance(a[5],b[5], levenshtein)		# distancia de levenshtein em 0.2 para artigos aproximados
