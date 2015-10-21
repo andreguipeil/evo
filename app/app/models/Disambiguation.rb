@@ -8,145 +8,68 @@ require 'set'
 
 class Disambiguation
 
-#######################################################
-# La desambiguacion
-# --> Entrada: array of entities
-# --> Saida: array of desambiguation [element a, element b, value_desambiguation]
-#######################################################
 
-	def disambiguationByArticleYear (entities, values)
-		valueNameAuthor 		= values['name_author'].to_i
-		valueNameAuthorLev 		= values['name_author_lev'].to_f
-		valueNameArticle 		= values['name_article'].to_i
-		valueNameArticleLev		= values['name_article_lev'].to_f
-		valueNameConference 		= values['name_conference'].to_i
-		valueNameConferenceLev 	= values['name_conference_lev'].to_f
-		valueRank 			= values['rank'].to_i
-		valueYear 			= values['year'].to_i
-		valueDisambiguation 		= values['vd'].to_i
+#######################################################
+# La etiquetacion
+# --> Entrada: array of entities
+# --> Saida: array of desambiguation [element a, element b, etiquetation]
+#######################################################
+def etiquetationByArticle (entities)
 
 		entitiesTemp = entities.dup
 		entitySames = Array.new
-		Rails.logger.info "Disambiguating"
 		entitiesTemp.each do | ent |
-			entityA = ent.dup
-			sames = Array.new
-			indexes = Array.new
-			profilesOriginals = Array.new
-
+			entityA = ent.dup 		# duplica a entidade para trabalhar sem mudar a referencia
+			entityB = ent.dup 		# duplica a entidade para trabalhar sem mudar a referencia
+			sames = Array.new 		# array de igualdades
+			indexes = Array.new 		# array de indexes para evitar deduplicação
+			indexA = 0
 			entityA.each do | a |
-				#Rails.logger.info "===================================================="
-				#Rails.logger.info "DESAMBIGUANDO ENTIDADE"
-				#Rails.logger.info " "+a[5]
-				#Rails.logger.info "===================================================="
+				indexB = 0
+				entityB.each do | b |
+					if(a[0] != b[0]) then 		# verifica se a comparação é do mesmo perfil, se for do mesmo perfil descarta
+						tempIndex1 = Array.new
+						tempIndex1.push(indexA)
+						tempIndex1.push(indexB)
+						tempIndex2 = Array.new
+						tempIndex2.push(indexB)
+						tempIndex2.push(indexA)
+
+						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
+							same = Hash.new
+							distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
 
 
-				if(!a[2].include? 'idp')
-					profilesOriginals.push(a)
-				end
-				# Rails.logger.info "PROFILES ORIGINALS"
-				# profilesOriginals.each do | ori |
-				#	Rails.logger.info ori[2]
-				# end
-			end
-			#Rails.logger.info "PROFILES ORIGINALS"
-			#profilesOriginals.each do | ori |
-			#	Rails.logger.info ori[2]
-			#end
-
-			entityA.each do | a |
-				indexA = 0
-				if(profilesOriginals.size > 1) then
-					profilesOriginals.each do | b |
-						indexB = 0
-						#Rails.logger.info "COMPARACAO"
-						#Rails.logger.info a[3]+" - "+ a[0]
-						#Rails.logger.info b[3]+" - "+ b[0]
-
-						if(a[0] != b[0]) then				# verifica se é do perfil dele mesmo, se for nao precisa comparar pq ou vai ser ele mesmo, ou outros autores
-							distanceName = Levenshtein.normalized_distance(a[3], b[3], valueNameAuthorLev) 		# verifica a distancia do author
-							#Rails.logger.info distanceName
-							#Rails.logger.info "Rolando disambiguação"
-							#Rails.logger.info "="
-							#Rails.logger.info a[3]
-							#Rails.logger.info b[3]
-							#Rails.logger.info "======================="
-							if distanceName != nil then
-								vd = 0				# zera o vd
-								vd += valueNameArticle 	# adiciona o valor do artigo
-								vd += valueNameAuthor 	# conta o valor do autor
-
-								# rank == rank
-								if (a[4] == b[4]) then
-									vd += valueRank
-								end
-								# conference == conference
-								if(a[6] == b[6]) then
-									vd += valueNameConference
-								else
-									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-									if distanceConference != nil then
-										vd += valueNameConference
-									end
-								end
-
-								# year == year
-								if(a[7] == b[7]) then
-									vd += valueYear
-								end
-
-								same = Hash.new
-								same[0] = a
-								same[1] = b
-								same[2] = vd
-								sames.push(same)
-							#	indexes.push(tempIndex1)
+							ha = Hash.new
+							hb = Hash.new
+							ha[2] = a[2]
+							ha[3] = a[3]
+							hb[3] = b[3]
+							hb[2] = b[2]
+							same[0] = ha
+							if (distance <= 0.1) then
+								same['et'] = 1
 							else
-								#Rails.logger.info "Não houve Desambiguação entre"
-								#Rails.logger.info "="
-								#Rails.logger.info a[3]
-								#Rails.logger.info b[3]
-								#Rails.logger.info "======================="
+								same['et'] = 0
 							end
+							same[1] = hb
+
+							sames.push(same)
+							indexes.push(tempIndex1)
 						end
 					end
+				indexB = indexB+1
 				end
+			indexA = indexA+1
 			end
 
-		#	sames.each do |same|
-		#		Rails.logger.info "===================================="
-		#		Rails.logger.info "LOG DE DISAMBIGUATION"
-		#		Rails.logger.info "===================================="
-		#		Rails.logger.info "AUTHOR 1 ====== AUTHOR 2"
-		#		Rails.logger.info same[0][3] +" <==> "+ same[1][3]
-		#		Rails.logger.info
-		#		Rails.logger.info "COMPARSIONS"
-		#		Rails.logger.info "["+same[0][0] +"] == ["+same[1][0]+"]"
-		#		Rails.logger.info "-----"
-		#		Rails.logger.info same[0][5] +" <==> "+ same[1][5]
-		#		Rails.logger.info same[0][4] +" <==> "+ same[1][4]
-		#		Rails.logger.info same[0][6] +" <==> "+ same[1][6]
-		#		Rails.logger.info same[0][7] +" <==> "+ same[1][7]
-		#		Rails.logger.info "-----"
-		#		Rails.logger.info "[VD] value disambiguation: " + same[2].to_s
-		#		Rails.logger.info " "
-		#		Rails.logger.info "============"
-		#		Rails.logger.info "========"
-		#		Rails.logger.info "==="
-		#	#	Rails.logger.info same[0][4] +" do RDF "+ same[0][0] +" - "+ same[0][3]  +" -- "+ same[0][8]+" == "+ same[1][4] +" do RDF "+ same[1][0] +" - "+ same[1][3] + " -- "+ same[1][8]
-		#	end
-			Rails.logger.info "..."
 			if sames.size > 0 then
 				entitySames.push(sames)
 			end
 		end
-		cont = 0
-		entitySames.each do | same |
-			cont += same.size
-		end
-		Rails.logger.info cont
 		return entitySames
 	end
+
 
 #######################################################
 # La desambiguacion
@@ -226,6 +149,7 @@ class Disambiguation
 								same[0] = a
 								same[1] = b
 								same[2] = vd
+								same[3] = 0
 								sames.push(same)
 								indexes.push(tempIndex1)
 							else
@@ -254,10 +178,20 @@ class Disambiguation
 									same[0] = a
 									same[1] = b
 									same[2] = vd
+									same[3] = 0
+									sames.push(same)
+									indexes.push(tempIndex1)
+								else
+									same = Hash.new
+									same[0] = a
+									same[1] = b
+									same[2] = vd
+									same[3] = 1
 									sames.push(same)
 									indexes.push(tempIndex1)
 								end
 							end
+
 						end
 					end
 				indexB = indexB+1
@@ -446,6 +380,144 @@ class Disambiguation
 		Rails.logger.info cont
 		return entitySames
 	end
+#######################################################
+# La desambiguacion
+# --> Entrada: array of entities
+# --> Saida: array of desambiguation [element a, element b, value_desambiguation]
+#######################################################
 
+	def disambiguationByArticleYear (entities, values)
+		valueNameAuthor 		= values['name_author'].to_i
+		valueNameAuthorLev 		= values['name_author_lev'].to_f
+		valueNameArticle 		= values['name_article'].to_i
+		valueNameArticleLev		= values['name_article_lev'].to_f
+		valueNameConference 		= values['name_conference'].to_i
+		valueNameConferenceLev 	= values['name_conference_lev'].to_f
+		valueRank 			= values['rank'].to_i
+		valueYear 			= values['year'].to_i
+		valueDisambiguation 		= values['vd'].to_i
+
+		entitiesTemp = entities.dup
+		entitySames = Array.new
+		Rails.logger.info "Disambiguating"
+		entitiesTemp.each do | ent |
+			entityA = ent.dup
+			sames = Array.new
+			indexes = Array.new
+			profilesOriginals = Array.new
+
+			entityA.each do | a |
+				#Rails.logger.info "===================================================="
+				#Rails.logger.info "DESAMBIGUANDO ENTIDADE"
+				#Rails.logger.info " "+a[5]
+				#Rails.logger.info "===================================================="
+
+
+				if(!a[2].include? 'idp')
+					profilesOriginals.push(a)
+				end
+				# Rails.logger.info "PROFILES ORIGINALS"
+				# profilesOriginals.each do | ori |
+				#	Rails.logger.info ori[2]
+				# end
+			end
+			#Rails.logger.info "PROFILES ORIGINALS"
+			#profilesOriginals.each do | ori |
+			#	Rails.logger.info ori[2]
+			#end
+
+			entityA.each do | a |
+				indexA = 0
+				if(profilesOriginals.size > 1) then
+					profilesOriginals.each do | b |
+						indexB = 0
+						#Rails.logger.info "COMPARACAO"
+						#Rails.logger.info a[3]+" - "+ a[0]
+						#Rails.logger.info b[3]+" - "+ b[0]
+
+						if(a[0] != b[0]) then				# verifica se é do perfil dele mesmo, se for nao precisa comparar pq ou vai ser ele mesmo, ou outros autores
+							distanceName = Levenshtein.normalized_distance(a[3], b[3], valueNameAuthorLev) 		# verifica a distancia do author
+							#Rails.logger.info distanceName
+							#Rails.logger.info "Rolando disambiguação"
+							#Rails.logger.info "="
+							#Rails.logger.info a[3]
+							#Rails.logger.info b[3]
+							#Rails.logger.info "======================="
+							if distanceName != nil then
+								vd = 0				# zera o vd
+								vd += valueNameArticle 	# adiciona o valor do artigo
+								vd += valueNameAuthor 	# conta o valor do autor
+
+								# rank == rank
+								if (a[4] == b[4]) then
+									vd += valueRank
+								end
+								# conference == conference
+								if(a[6] == b[6]) then
+									vd += valueNameConference
+								else
+									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+									if distanceConference != nil then
+										vd += valueNameConference
+									end
+								end
+
+								# year == year
+								if(a[7] == b[7]) then
+									vd += valueYear
+								end
+
+								same = Hash.new
+								same[0] = a
+								same[1] = b
+								same[2] = vd
+								sames.push(same)
+							#	indexes.push(tempIndex1)
+							else
+								#Rails.logger.info "Não houve Desambiguação entre"
+								#Rails.logger.info "="
+								#Rails.logger.info a[3]
+								#Rails.logger.info b[3]
+								#Rails.logger.info "======================="
+							end
+						end
+					end
+				end
+			end
+
+		#	sames.each do |same|
+		#		Rails.logger.info "===================================="
+		#		Rails.logger.info "LOG DE DISAMBIGUATION"
+		#		Rails.logger.info "===================================="
+		#		Rails.logger.info "AUTHOR 1 ====== AUTHOR 2"
+		#		Rails.logger.info same[0][3] +" <==> "+ same[1][3]
+		#		Rails.logger.info
+		#		Rails.logger.info "COMPARSIONS"
+		#		Rails.logger.info "["+same[0][0] +"] == ["+same[1][0]+"]"
+		#		Rails.logger.info "-----"
+		#		Rails.logger.info same[0][5] +" <==> "+ same[1][5]
+		#		Rails.logger.info same[0][4] +" <==> "+ same[1][4]
+		#		Rails.logger.info same[0][6] +" <==> "+ same[1][6]
+		#		Rails.logger.info same[0][7] +" <==> "+ same[1][7]
+		#		Rails.logger.info "-----"
+		#		Rails.logger.info "[VD] value disambiguation: " + same[2].to_s
+		#		Rails.logger.info " "
+		#		Rails.logger.info "============"
+		#		Rails.logger.info "========"
+		#		Rails.logger.info "==="
+		#	#	Rails.logger.info same[0][4] +" do RDF "+ same[0][0] +" - "+ same[0][3]  +" -- "+ same[0][8]+" == "+ same[1][4] +" do RDF "+ same[1][0] +" - "+ same[1][3] + " -- "+ same[1][8]
+		#	end
+			Rails.logger.info "..."
+			if sames.size > 0 then
+				entitySames.push(sames)
+			end
+		end
+		cont = 0
+		entitySames.each do | same |
+			cont += same.size
+		end
+		Rails.logger.info cont
+		return entitySames
+	end
 
 end

@@ -136,20 +136,39 @@ respond_to :html, :json, :js
 		when '2' then
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 			entitySames = dis.disambiguationByArticle(authorsTemp, values)
+			etiquetation = dis.etiquetationByArticle(authorsTemp)
 		when '3' then
 			entitySames = dis.disambiguationByArticle(authorsTemp, values)
+			etiquetation = dis.etiquetationByArticle(authorsTemp)
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
-		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
+		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
+		arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
+		arq.createArq(entitySames, graphArq+"-result.txt")
 
-		entitySames.each do | sames |
+
+		etiquetation.each do | sames |
 			logger.info " "
 			logger.info "ENTIDADE ======"
 			logger.info " "
+			logger.info "ERRADOS"
+			logger.info "====================================="
 			sames.each do | s |
-				logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
+				if (s[3] == 1) then
+				    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
+				end
 			end
+
+			logger.info " "
+			logger.info "CERTOS"
+			logger.info "====================================="
+			sames.each do | s |
+				if (s[3] == 0) then
+				    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
+				end
+			end
+
 		end
 
 
