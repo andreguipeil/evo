@@ -118,11 +118,11 @@ respond_to :html, :json, :js
 			# =========
 			arq.createArq(clusters, graphArq+'.txt')						# cria arquivo e insere os blocos semanticos
 			arq.createArqProfiles(profiles, graphArq+'-profiles.txt')
-			arq.createArqArticles(clustersArt, graphArq+'-articles.txt')
+			#arq.createArqArticles(clustersArt, graphArq+'-articles.txt')
 		end
 		authorsTemp = arq.readArq(graphArq+'.txt')					# carrega os blocos semanticos
 		profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
-		articlesTemp = arq.readArqArticles(graphArq+'-articles.txt')
+		#articlesTemp = arq.readArqArticles(graphArq+'-articles.txt')
 		arq.createArqConfig(values, graphArq+"-config.txt")
 		#logger.info articlesTemp
 
@@ -135,41 +135,44 @@ respond_to :html, :json, :js
 			entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
 		when '2' then
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-			entitySames = dis.disambiguationByArticle(authorsTemp, values)
-			etiquetation = dis.etiquetationByArticle(authorsTemp)
+			entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
+			#etiquetation = dis.etiquetationByArticle(authorsTemp)
 		when '3' then
-			entitySames = dis.disambiguationByArticle(authorsTemp, values)
-			etiquetation = dis.etiquetationByArticle(authorsTemp)
+			entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
+			#etiquetation = dis.etiquetationByArticle(authorsTemp)
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
 		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
-		arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
-		arq.createArq(entitySames, graphArq+"-result.txt")
+		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
+		arq.createArq(entitySamesNoGap, graphArq+"nogap-result.txt")
+		arq.createArq(entitySamesWithGap, graphArq+"withgap-result.txt")
 
 
-		etiquetation.each do | sames |
-			logger.info " "
-			logger.info "ENTIDADE ======"
-			logger.info " "
-			logger.info "ERRADOS"
-			logger.info "====================================="
-			sames.each do | s |
-				if (s[3] == 1) then
-				    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
-				end
-			end
+		#etiquetation.each do | sames |
+		#	logger.info " "
+		#	logger.info "ENTIDADE ======"
+		#	logger.info " "
+		#	logger.info "ERRADOS"
+		#	logger.info "====================================="
+		#	sames.each do | s |
+		#		if (s[3] == 1) then
+		#		    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
+		#		end
+		#	end
 
-			logger.info " "
-			logger.info "CERTOS"
-			logger.info "====================================="
-			sames.each do | s |
-				if (s[3] == 0) then
-				    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
-				end
-			end
+		#	logger.info " "
+		#	logger.info "CERTOS"
+		#	logger.info "====================================="
+		#	sames.each do | s |
+		#		if (s[3] == 0) then
+		#		    logger.info  "#{s[0][3]} <=> #{s[1][3]}  vd: #{s[2]} == [ #{s[0][4]} #{s[0][6]}  #{s[0][7]} #{s[0][5]} ] == #{s[1][4]} #{s[1][6]}  #{s[1][7]} #{s[1][5]}"
+		#		end
+		#	end
 
-		end
+		#end
 
 
 		# =========
@@ -278,6 +281,129 @@ respond_to :html, :json, :js
 
 		respond_with(ret = true)
 	end
+
+	def validateResult
+		graph = params[:graph]
+
+		values = Hash.new
+		values['graph'] = params[:graph]
+		values['vd'] = params[:vd]
+		values['name_author'] = params[:name_author]
+		values['name_author_lev'] = params[:name_author_lev]
+		values['name_article'] = params[:name_article]
+		values['name_article_lev'] = params[:name_article_lev]
+		values['name_conference'] = params[:name_conference]
+		values['name_conference_lev'] = params[:name_conference_lev]
+		values['rank'] = params[:rank]
+		values['year'] = params[:year]
+		values['rules'] = params[:rules]
+
+
+
+
+		arq = FileArray.new
+		graphArq = graph.gsub('.com', '')
+		graphArq = graphArq.gsub('http://', '')
+		graphArq = graphArq.gsub('www.', '')
+		graphArq = graphArq.gsub('.br', '')
+		graphArq = graphArq.gsub('.org', '')
+		graphArq = graphArq.gsub('.net', '')
+		graphArq = graphArq.gsub('.edu', '')
+
+		# nome do arquivo ==> grafo+criterio+leveinstein.txt
+		# criterio: 1 -> nome do autor
+		# criterio: 2 -> nome do artigo
+		# criterio: 3 -> nome do artigo + ano
+		case values['rules']
+			when '1' then
+				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
+			when '2' then
+				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+			when '3' then
+				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+		end
+
+
+		#logger.info graphArq+"-etiquetation.txt"
+		#if(File.exist?(graphArq+"-etiquetation.txt") == true) then
+			etiquetation = arq.readArq("laburb-etiquetation.txt")
+			resultnogap = arq.readArq(graphArq+"nogap-result.txt")
+			resultwithgap = arq.readArq(graphArq+"withgap-result.txt")
+		#else
+			#logger.info "aqui no etiquetation false"
+			#return respond_with(false);
+		#end
+
+
+		logger.info " NO GAP"
+		logger.info " ==============================="
+		acertos_total = 0
+		erros_total = 0
+		etiquetation.zip(resultnogap).each do | et, res |
+			acertos = 0
+			erros = 0
+			et.zip(res).each do | a, b |
+				if(a['et'] == b[3]) then
+					acertos = acertos+1
+				else
+					erros = erros+1
+				end
+			end
+			logger.info acertos
+			logger.info erros
+			logger.info " -- "
+			acertos_total = acertos_total+acertos
+			erros_total = erros_total+erros
+		end
+		logger.info acertos_total
+		logger.info erros_total
+
+		logger.info " ==============================="
+
+
+		logger.info " WITH GAP"
+		logger.info " ==============================="
+		acertos_total = 0
+		erros_total = 0
+		etiquetation.zip(resultwithgap).each do | et, res |
+			acertos = 0
+			erros = 0
+			et.zip(res).each do | a, b |
+				if(a['et'] == b[3]) then
+					acertos = acertos+1
+				else
+					erros = erros+1
+				end
+			end
+			logger.info acertos
+			logger.info erros
+			logger.info " -- "
+			acertos_total = acertos_total+acertos
+			erros_total = erros_total+erros
+		end
+		logger.info acertos_total
+		logger.info erros_total
+
+		logger.info " ==============================="
+
+
+		#result.each do | res |
+		#	logger.info res.size
+		#end
+
+
+		#@ret['etiquetation'] = etiquetation
+		#@ret['result'] = result
+		respond_with (@ret = true)
+	end
+
+
+
+
+
+
+
+
 
 	def navigation
 		graph = params[:graph0]+":"+params[:graph1]

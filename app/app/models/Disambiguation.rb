@@ -14,7 +14,7 @@ class Disambiguation
 # --> Entrada: array of entities
 # --> Saida: array of desambiguation [element a, element b, etiquetation]
 #######################################################
-def etiquetationByArticle (entities)
+	def etiquetationByArticle (entities)
 
 		entitiesTemp = entities.dup
 		entitySames = Array.new
@@ -77,7 +77,7 @@ def etiquetationByArticle (entities)
 # --> Saida: array of desambiguation [element a, element b, value_desambiguation]
 #######################################################
 
-	def disambiguationByArticle (entities, values)
+	def disambiguationByArticleWithGap (entities, values)
 		valueNameAuthor 		= values['name_author'].to_i
 		valueNameAuthorLev 		= values['name_author_lev'].to_f
 		valueNameArticle 		= values['name_article'].to_i
@@ -149,7 +149,7 @@ def etiquetationByArticle (entities)
 								same[0] = a
 								same[1] = b
 								same[2] = vd
-								same[3] = 0
+								same[3] = 1
 								sames.push(same)
 								indexes.push(tempIndex1)
 							else
@@ -186,10 +186,148 @@ def etiquetationByArticle (entities)
 									same[0] = a
 									same[1] = b
 									same[2] = vd
-									same[3] = 1
+									same[3] = 0
 									sames.push(same)
 									indexes.push(tempIndex1)
 								end
+							end
+
+						end
+					end
+				indexB = indexB+1
+				end
+			indexA = indexA+1
+			end
+
+			# estatistica de cada entidade
+			#est['nivel1'] = nivel1
+			#est['nivel2'] = nivel2
+			#est['nivel3'] = nivel3
+			#est['nivel4'] = nivel4
+			#est['nivel5'] = sames.size
+			#est['nivel6'] = nivel6
+			#est['nivel7'] = nivel7
+			#estatistica.push(est);
+			## ====
+
+			if sames.size > 0 then
+				entitySames.push(sames)
+			end
+		end
+
+
+		#cont = 0
+		#entitySames.each do | same |
+		#	cont += same.size
+		#end
+		#Rails.logger.info cont
+		#fileEstatistica = FileArray.new
+		#fileEstatistica.insertLogFile(estatistica, 1)
+
+		return entitySames
+	end
+
+
+#######################################################
+# La desambiguacion
+# --> Entrada: array of entities
+# --> Saida: array of desambiguation [element a, element b, value_desambiguation]
+#######################################################
+
+	def disambiguationByArticleNoGap (entities, values)
+		valueNameAuthor 		= values['name_author'].to_i
+		valueNameAuthorLev 		= values['name_author_lev'].to_f
+		valueNameArticle 		= values['name_article'].to_i
+		valueNameArticleLev		= values['name_article_lev'].to_f
+		valueNameConference 		= values['name_conference'].to_i
+		valueNameConferenceLev 	= values['name_conference_lev'].to_f
+		valueRank 			= values['rank'].to_i
+		valueYear 			= values['year'].to_i
+		valueDisambiguation 		= values['vd'].to_i
+
+
+		entitiesTemp = entities.dup
+		entitySames = Array.new
+		entitiesTemp.each do | ent |
+			est = Hash.new			# cria uma hash para fazer a estatistica da entidade
+			entityA = ent.dup 		# duplica a entidade para trabalhar sem mudar a referencia
+			entityB = ent.dup 		# duplica a entidade para trabalhar sem mudar a referencia
+			sames = Array.new 		# array de igualdades
+			indexes = Array.new 		# array de indexes para evitar deduplicação
+			indexA = 0
+			entityA.each do | a |
+				indexB = 0
+				entityB.each do | b |
+					if(a[0] != b[0]) then 		# verifica se a comparação é do mesmo perfil, se for do mesmo perfil descarta
+						tempIndex1 = Array.new
+						tempIndex1.push(indexA)
+						tempIndex1.push(indexB)
+						tempIndex2 = Array.new
+						tempIndex2.push(indexB)
+						tempIndex2.push(indexA)
+
+						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
+							vd = 0
+							vd += valueNameArticle
+							distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
+							if (distance <= valueNameAuthorLev) then
+								vd += valueNameAuthor 		# conta o valor do autor
+
+								# rank == rank
+								if (a[4] == b[4]) then
+									vd += valueRank
+								end
+								# conference == conference
+								if(a[6] == b[6]) then
+									vd += valueNameConference
+								else
+									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+									if distanceConference != nil then
+										vd += valueNameConference
+									end
+								end
+
+								# year == year
+								if(a[7] == b[7]) then
+									vd += valueYear
+								end
+
+								same = Hash.new
+								same[0] = a
+								same[1] = b
+								same[2] = vd
+								same[3] = 1
+								sames.push(same)
+								indexes.push(tempIndex1)
+							else
+
+								# rank == rank
+								if (a[4] == b[4]) then
+									vd += valueRank
+								end
+								# conference == conference
+								if(a[6] == b[6]) then
+									vd += valueNameConference
+								else
+									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+									if distanceConference != nil then
+										vd += valueNameConference
+									end
+								end
+
+								# year == year
+								if(a[7] == b[7]) then
+									vd += valueYear
+								end
+
+								same = Hash.new
+								same[0] = a
+								same[1] = b
+								same[2] = vd
+								same[3] = 0
+								sames.push(same)
+								indexes.push(tempIndex1)
+
 							end
 
 						end
