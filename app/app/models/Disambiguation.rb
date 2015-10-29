@@ -97,6 +97,12 @@ class Disambiguation
 		nivel6 = 0	# artigos iguais
 		nivel7 = 0	# artigos muito proximos
 
+
+		contIguais = 0
+		contDiferentes = 0
+		contDiferentesLev = 0
+		contDiferentesErrados = 0
+		contDiferentesLevGap = 0
 		entitiesTemp = entities.dup
 		entitySames = Array.new
 		entitiesTemp.each do | ent |
@@ -120,8 +126,8 @@ class Disambiguation
 						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
 							vd = 0
 							vd += valueNameArticle
-							distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
-							if (distance <= valueNameAuthorLev) then
+
+							if( a[3] == b[3]) then
 								vd += valueNameAuthor 		# conta o valor do autor
 
 								# rank == rank
@@ -143,17 +149,22 @@ class Disambiguation
 									vd += valueYear
 								end
 
-								nivel3 = nivel3+1
-
+								contIguais = contIguais+1
 								same = Hash.new
 								same[0] = a
 								same[1] = b
 								same[2] = vd
 								same[3] = 1
+								same[4] = 1
 								sames.push(same)
 								indexes.push(tempIndex1)
+
 							else
-								if (distance <= 0.5) then
+								contDiferentes = contDiferentes+1
+								distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
+								if (distance <= valueNameAuthorLev) then
+									contDiferentesLev = contDiferentesLev+1
+									vd += valueNameAuthor 		# conta o valor do autor
 
 									# rank == rank
 									if (a[4] == b[4]) then
@@ -175,22 +186,64 @@ class Disambiguation
 									end
 
 									same = Hash.new
+									#id = a[2].rpartition('#author-').last
+									#id << b[2].rpartition('#author-').last
+
+									#same['id'] = id
 									same[0] = a
 									same[1] = b
 									same[2] = vd
-									same[3] = 0
+									same[3] = 1
+									same[4] = 2
 									sames.push(same)
 									indexes.push(tempIndex1)
 								else
-									same = Hash.new
-									same[0] = a
-									same[1] = b
-									same[2] = vd
-									same[3] = 0
-									sames.push(same)
-									indexes.push(tempIndex1)
+									if (distance <= 0.5) then
+										contDiferentesLevGap = contDiferentesLevGap+1
+										# rank == rank
+										if (a[4] == b[4]) then
+											vd += valueRank
+										end
+										# conference == conference
+										if(a[6] == b[6]) then
+											vd += valueNameConference
+										else
+											distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+											if distanceConference != nil then
+												vd += valueNameConference
+											end
+										end
+
+										# year == year
+										if(a[7] == b[7]) then
+											vd += valueYear
+										end
+
+										same = Hash.new
+										same[0] = a
+										same[1] = b
+										same[2] = vd
+										same[3] = 1
+										same[4] = 3
+										sames.push(same)
+										indexes.push(tempIndex1)
+									else
+										contDiferentesErrados = contDiferentesErrados+1
+										same = Hash.new
+										same[0] = a
+										same[1] = b
+										same[2] = vd
+										same[3] = 0
+										same[4] = 4
+										sames.push(same)
+										indexes.push(tempIndex1)
+									end
 								end
+
 							end
+
+
+
 
 						end
 					end
@@ -210,12 +263,16 @@ class Disambiguation
 			#estatistica.push(est);
 			## ====
 
-			if sames.size > 0 then
+			#if sames.size > 0 then
 				entitySames.push(sames)
-			end
+			#end
 		end
 
-
+		Rails.logger.info "Iguais: #{contIguais}"
+		Rails.logger.info "Diferentes: #{contDiferentes}"
+		Rails.logger.info "==== Lev: #{contDiferentesLev}"
+		Rails.logger.info "==== LevGap: #{contDiferentesLevGap}"
+		Rails.logger.info "==== Errados: #{contDiferentesErrados}"
 		#cont = 0
 		#entitySames.each do | same |
 		#	cont += same.size
@@ -245,7 +302,10 @@ class Disambiguation
 		valueYear 			= values['year'].to_i
 		valueDisambiguation 		= values['vd'].to_i
 
-
+		contIguais = 0
+		contDiferentes = 0
+		contDiferentesLev = 0
+		contDiferentesErrados = 0
 		entitiesTemp = entities.dup
 		entitySames = Array.new
 		entitiesTemp.each do | ent |
@@ -269,8 +329,8 @@ class Disambiguation
 						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
 							vd = 0
 							vd += valueNameArticle
-							distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
-							if (distance <= valueNameAuthorLev) then
+							if(a[3] == b[3]) then
+
 								vd += valueNameAuthor 		# conta o valor do autor
 
 								# rank == rank
@@ -292,43 +352,87 @@ class Disambiguation
 									vd += valueYear
 								end
 
+								contIguais = contIguais+1
 								same = Hash.new
 								same[0] = a
 								same[1] = b
 								same[2] = vd
 								same[3] = 1
+								same[4] = 1
 								sames.push(same)
 								indexes.push(tempIndex1)
+
 							else
+								contDiferentes = contDiferentes+1
+								distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
 
-								# rank == rank
-								if (a[4] == b[4]) then
-									vd += valueRank
-								end
-								# conference == conference
-								if(a[6] == b[6]) then
-									vd += valueNameConference
-								else
-									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-									if distanceConference != nil then
-										vd += valueNameConference
+
+								if (distance <= valueNameAuthorLev) then
+									contDiferentesLev = contDiferentesLev+1
+									vd += valueNameAuthor 		# conta o valor do autor
+
+									# rank == rank
+									if (a[4] == b[4]) then
+										vd += valueRank
 									end
-								end
+									# conference == conference
+									if(a[6] == b[6]) then
+										vd += valueNameConference
+									else
+										distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+										if distanceConference != nil then
+											vd += valueNameConference
+										end
+									end
 
-								# year == year
-								if(a[7] == b[7]) then
-									vd += valueYear
-								end
+									# year == year
+									if(a[7] == b[7]) then
+										vd += valueYear
+									end
 
-								same = Hash.new
-								same[0] = a
-								same[1] = b
-								same[2] = vd
-								same[3] = 0
-								sames.push(same)
-								indexes.push(tempIndex1)
+									same = Hash.new
+									same[0] = a
+									same[1] = b
+									same[2] = vd
+									same[3] = 1
+									same[4] = 2
+									sames.push(same)
+									indexes.push(tempIndex1)
+								else
+									contDiferentesErrados = contDiferentesErrados+1
+									# rank == rank
+									if (a[4] == b[4]) then
+										vd += valueRank
+									end
+									# conference == conference
+									if(a[6] == b[6]) then
+										vd += valueNameConference
+									else
+										distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+										if distanceConference != nil then
+											vd += valueNameConference
+										end
+									end
+
+									# year == year
+									if(a[7] == b[7]) then
+										vd += valueYear
+									end
+
+									same = Hash.new
+									same[0] = a
+									same[1] = b
+									same[2] = vd
+									same[3] = 0
+									same[4] = 4
+									sames.push(same)
+									indexes.push(tempIndex1)
+
+								end
 
 							end
+
+
 
 						end
 					end
@@ -353,7 +457,10 @@ class Disambiguation
 			end
 		end
 
-
+		Rails.logger.info "Iguais: #{contIguais}"
+		Rails.logger.info "Diferentes: #{contDiferentes}"
+		Rails.logger.info "==== Lev: #{contDiferentesLev}"
+		Rails.logger.info "==== Errados: #{contDiferentesErrados}"
 		#cont = 0
 		#entitySames.each do | same |
 		#	cont += same.size

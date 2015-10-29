@@ -1,0 +1,19 @@
+{"refBy"=>"http://ufpel.edu.br/lattes/0933121197558439", "name"=>"André Guimarães Peil", "nameNormalized"=>"andre-guimaraes-peil", "givenName"=>["A. G."], "familyName"=>["PEIL"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/0217953377625520", "name"=>"Glauco Roberto Munsberg dos Santos", "nameNormalized"=>"glauco-roberto-munsberg-dos-santos", "givenName"=>["Glauco Roberto M.", "Glauco Roberto"], "familyName"=>["SANTOS", "MUNSBERG"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/5251871279558601", "name"=>"Maurício Couto Polidori", "nameNormalized"=>"mauricio-couto-polidori", "givenName"=>["Maurício Couto"], "familyName"=>["POLIDORI"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/3623706033011018", "name"=>"Otávio Martins Peres", "nameNormalized"=>"otavio-martins-peres", "givenName"=>["Otavio M.", "OTÁVIO MARTINS"], "familyName"=>["PERES"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/6927803856702261", "name"=>"Eduardo Rocha", "nameNormalized"=>"eduardo-rocha", "givenName"=>["E."], "familyName"=>["ROCHA"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/0811732176922470", "name"=>"Alexandre Pereira Santos", "nameNormalized"=>"alexandre-pereira-santos", "givenName"=>["A. P."], "familyName"=>["SANTOS"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/7643651198705918", "name"=>"Marcus Vinicius Pereira Saraiva", "nameNormalized"=>"marcus-vinicius-pereira-saraiva", "givenName"=>["M. V. P."], "familyName"=>["SARAIVA"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/6376235358938671", "name"=>"Ana Paula Neto de Faria", "nameNormalized"=>"ana-paula-neto-de-faria", "givenName"=>["Ana Paula Neto de", "A. P. N."], "familyName"=>["FARIA"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/8611664929838425", "name"=>"Ana Paula Polidori Zechlinski", "nameNormalized"=>"ana-paula-polidori-zechlinski", "givenName"=>["A. P. P."], "familyName"=>["ZECHLINSKI"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/0702035357125121", "name"=>"Rafaela Barros de Pinho", "nameNormalized"=>"rafaela-barros-de-pinho", "givenName"=>["R. B."], "familyName"=>["PINHO"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/6234575036510146", "name"=>"Laís Dellinghausen Portela", "nameNormalized"=>"lais-dellinghausen-portela", "givenName"=>["L. D."], "familyName"=>["PORTELA"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/9571277459347727", "name"=>"Taís Beltrame dos Santos", "nameNormalized"=>"tais-beltrame-dos-santos", "givenName"=>["T. B."], "familyName"=>["SANTOS"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/0741704260227015", "name"=>"Bárbara de Bárbara Hypolito", "nameNormalized"=>"barbara-de-barbara-hypolito", "givenName"=>["B. B."], "familyName"=>["HYPOLITO"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/1703526475128461", "name"=>"Luana Pavan Detoni", "nameNormalized"=>"luana-pavan-detoni", "givenName"=>["L. P."], "familyName"=>["DETONI"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/2809172806147764", "name"=>"Débora Souto Allemand", "nameNormalized"=>"debora-souto-allemand", "givenName"=>["D. S.", "DÉBORA"], "familyName"=>["ALLEMAND", "SOUTO ALLEMAND"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/1770912662486261", "name"=>"Fernanda Tomiello", "nameNormalized"=>"fernanda-tomiello", "givenName"=>["Fernanda."], "familyName"=>["TOMIELLO"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/5334168356219435", "name"=>"Lucas Boeira Bittencourt", "nameNormalized"=>"lucas-boeira-bittencourt", "givenName"=>["L. B."], "familyName"=>["BITTENCOURT"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/7158172139308069", "name"=>"Cristiane dos Santos Nunes", "nameNormalized"=>"cristiane-dos-santos-nunes", "givenName"=>["C.", "C. S.", "Cristiane dos Santos"], "familyName"=>["NUNES"]}
+{"refBy"=>"http://ufpel.edu.br/lattes/6584714847855967", "name"=>"Gabriela Pasqualin Cavalheiro", "nameNormalized"=>"gabriela-pasqualin-cavalheiro", "givenName"=>["G. P."], "familyName"=>["CAVALHEIRO"]}

@@ -1,0 +1,7 @@
+{"graph"=>"http://laburb.com", "vd"=>"5", "name_author"=>"3", "name_author_lev"=>"0.45", "name_article"=>"2", "name_article_lev"=>"0.1", "name_conference"=>"3", "name_conference_lev"=>"0.15", "rank"=>"2", "year"=>"1", "rules"=>"2"}
+
+Iguais: 670
+Diferentes: 4421
+==== Lev: 171
+==== LevGap: 17
+==== Errados: 4233

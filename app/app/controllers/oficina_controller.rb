@@ -334,63 +334,145 @@ respond_to :html, :json, :js
 			#return respond_with(false);
 		#end
 
-
 		logger.info " NO GAP"
 		logger.info " ==============================="
 		acertos_total = 0
 		erros_total = 0
+		cont1 = 0
+		cont2 = 0
+		cont3 = 0
+		cont4 = 0
 		etiquetation.zip(resultnogap).each do | et, res |
 			acertos = 0
 			erros = 0
 			et.zip(res).each do | a, b |
 				if(a['et'] == b[3]) then
 					acertos = acertos+1
+
 				else
 					erros = erros+1
 				end
+				case b[4]
+					when 1 then
+						cont1 = cont1+1
+					when 2 then
+						cont2 = cont2+1
+					when 3 then
+						cont3 = cont3+1
+					when 4 then
+						cont4 = cont4+1
+				end
 			end
-			logger.info acertos
-			logger.info erros
-			logger.info " -- "
+			#logger.info acertos
+			#logger.info erros
+			#logger.info " -- "
 			acertos_total = acertos_total+acertos
 			erros_total = erros_total+erros
 		end
-		logger.info acertos_total
-		logger.info erros_total
-
+		logger.info "Total de Acertos: #{acertos_total}"
+		logger.info "Total de Erros: #{erros_total}"
+		logger.info "Igual: #{cont1}"
+		logger.info "Lev: #{cont2}"
+		logger.info "LevGap: #{cont3}"
+		logger.info "Errados: #{cont4}"
 		logger.info " ==============================="
-
 
 		logger.info " WITH GAP"
 		logger.info " ==============================="
 		acertos_total = 0
 		erros_total = 0
+		cont1 = 0
+		cont2 = 0
+		cont3 = 0
+		cont4 = 0
+		cont11 = 0
+		cont22 = 0
+		cont33 = 0
+		cont44 = 0
 		etiquetation.zip(resultwithgap).each do | et, res |
 			acertos = 0
 			erros = 0
 			et.zip(res).each do | a, b |
 				if(a['et'] == b[3]) then
 					acertos = acertos+1
+					case b[4]
+						when 1 then
+							cont1 = cont1+1
+						when 2 then
+							cont2 = cont2+1
+						when 3 then
+							cont3 = cont3+1
+						when 4 then
+							cont4 = cont4+1
+					end
 				else
 					erros = erros+1
+					case b[4]
+						when 1 then
+							cont11 = cont11+1
+						when 2 then
+							logger.info "#{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+							cont22 = cont22+1
+						when 3 then
+							cont33 = cont33+1
+						when 4 then
+							cont44 = cont44+1
+					end
 				end
+
 			end
-			logger.info acertos
-			logger.info erros
-			logger.info " -- "
+			#logger.info acertos
+			#logger.info erros
+			#logger.info " -- "
 			acertos_total = acertos_total+acertos
 			erros_total = erros_total+erros
 		end
-		logger.info acertos_total
-		logger.info erros_total
-
+		logger.info "Total de Acertos: #{acertos_total}"
+		logger.info "Total de Erros: #{erros_total}"
+		logger.info "ETIQUETAMENTOS CERTOS"
+		logger.info "====================="
+		logger.info "Igual: #{cont1}"
+		logger.info "Lev: #{cont2}"
+		logger.info "LevGap: #{cont3}"
+		logger.info "Errados: #{cont4}"
+		logger.info "ETIQUETAMENTOS ERRADOS"
+		logger.info "====================="
+		logger.info "Igual: #{cont11}"
+		logger.info "Lev: #{cont22}"
+		logger.info "LevGap: #{cont33}"
+		logger.info "Errados: #{cont44}"
 		logger.info " ==============================="
 
 
-		#result.each do | res |
-		#	logger.info res.size
+		#acertos_total = 0
+		#erros_total = 0
+		#resultnogap.each do | entity |
+		#	erros = 0
+		#	acertos = 0
+		#	entity.each do | same |
+		#		etiquetation.each do | entityEtiquetation |
+		#			entityEtiquetation.each do | sameEt |
+		#
+		#				if( (same[0][2] == sameEt[0][2]) && (same[1][2] == sameEt[1][2]) ) then#								if(same[3] == sameEt['et']) then
+		#							acertos = acertos+1
+		#						else
+		#							erros = erros+1
+		#						end
+							#end
+		#				end
+		#			end
+		#		end
+#
+		#	end
+		#	logger.info acertos
+		#	logger.info erros
+		#	logger.info " -- "
+		#	acertos_total = acertos_total+acertos
+		#	erros_total = erros_total+erros
 		#end
 
+		#logger.info "Acertos: #{acertos_total}"
+		#logger.info "Erros: #{erros_total}"
 
 		#@ret['etiquetation'] = etiquetation
 		#@ret['result'] = result

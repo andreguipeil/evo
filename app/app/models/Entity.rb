@@ -71,21 +71,19 @@ class Entity
 	def clusterizationByArticle (triples, levenshtein)
 		statistics = Array.new 			# array estatistica possui todos os dados estatisticos que vão para o log
 		est = Hash.new				# cria uma hash para declarar os dados estaticos atraves de nome
-		est['numero_triplas'] = triples.size	# faz a conta do numero de triplas que vem do banco
-		contClusterizacao = 0
+
 		Rails.logger.info "Clusterization by Article"
 		entities = Array.new
 		sideA 	= triples.dup 			# duplica por copia
 		sideB 	= triples.dup 			# duplica por copia
-
+		Rails.logger.info triples.size		# faz a conta do numero de triplas que vem do banco
 		sideA.each do |a|			# percorre a
-			Rails.logger.info sideB.size
+			#Rails.logger.info sideB.size
 			if(sideB.size > 0) then
 				ent 	  = Array.new
 				newSide = Array.new
 					sideB.each do |b|	# percorre b
 						# clusterizando por artigo
-						contClusterizacao = contClusterizacao+1
 						distance = Levenshtein.normalized_distance(a[5],b[5], levenshtein)		# distancia de levenshtein em 0.2 para artigos aproximados
 						if distance != nil then								# verifica a distancia se bater adiciona
 							arr = b
@@ -99,11 +97,22 @@ class Entity
 			end
 		end
 
-		Rails.logger.info entities.size
+		#Rails.logger.info entities.size
+		total = 0
 		entities.each do | ent |
-			Rails.logger.info ent.size
+			total = total + ent.size
+		end
+		Rails.logger.info "cima batendo com o de baixo"
+		Rails.logger.info total
+		vazias = 0
+		entities.each do | ent |
+			if(ent.size == 0) then
+				vazias = vazias + 1
+			end
+
 		end
 
+		Rails.logger.info "Entidades Vazias: #{vazias}"
 		return entities
 	end
 
