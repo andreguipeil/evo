@@ -135,20 +135,20 @@ respond_to :html, :json, :js
 			entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
 		when '2' then
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-			entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
-			entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
-			#etiquetation = dis.etiquetationByArticle(authorsTemp)
+			#entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			#entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
+			etiquetation = dis.etiquetationByArticle(authorsTemp)
 		when '3' then
-			entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
-			entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
-			#etiquetation = dis.etiquetationByArticle(authorsTemp)
+			#entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			#entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
+			etiquetation = dis.etiquetationByArticle(authorsTemp)
 			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
 		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
-		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
-		arq.createArq(entitySamesNoGap, graphArq+"nogap-result.txt")
-		arq.createArq(entitySamesWithGap, graphArq+"withgap-result.txt")
+		arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
+		#arq.createArq(entitySamesNoGap, graphArq+"nogap-result.txt")
+		#arq.createArq(entitySamesWithGap, graphArq+"withgap-result.txt")
 
 
 		#etiquetation.each do | sames |

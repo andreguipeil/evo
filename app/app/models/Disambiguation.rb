@@ -47,7 +47,7 @@ class Disambiguation
 							hb[3] = b[3]
 							hb[2] = b[2]
 							same[0] = ha
-							if (distance <= 0.1) then
+							if (distance <= 0.01) then
 								same['et'] = 1
 							else
 								same['et'] = 0

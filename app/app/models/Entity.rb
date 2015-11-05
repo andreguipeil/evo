@@ -86,6 +86,7 @@ class Entity
 						# clusterizando por artigo
 						distance = Levenshtein.normalized_distance(a[5],b[5], levenshtein)		# distancia de levenshtein em 0.2 para artigos aproximados
 						if distance != nil then								# verifica a distancia se bater adiciona
+						#if ( a[5] == b[5] )
 							arr = b
 							ent.push(arr)
 						else
@@ -96,23 +97,8 @@ class Entity
 				sideB = newSide				# sideB recebe todos os artigos que nao foram selecionados
 			end
 		end
+		validateClusterization(entities)
 
-		#Rails.logger.info entities.size
-		total = 0
-		entities.each do | ent |
-			total = total + ent.size
-		end
-		Rails.logger.info "cima batendo com o de baixo"
-		Rails.logger.info total
-		vazias = 0
-		entities.each do | ent |
-			if(ent.size == 0) then
-				vazias = vazias + 1
-			end
-
-		end
-
-		Rails.logger.info "Entidades Vazias: #{vazias}"
 		return entities
 	end
 
@@ -149,7 +135,7 @@ class Entity
 			y[year] = array.size
 			estatistica.push(y)
 			sideA.each do |a|					# percorre a
-				Rails.logger.info sideB.size
+				#Rails.logger.info sideB.size
 				if(sideB.size > 0) then
 					ent 	  = Array.new
 					newSide = Array.new
@@ -176,11 +162,71 @@ class Entity
 		estatistica.push(est)
 		fileEstatistica = FileArray.new
 		fileEstatistica.insertLogFile(estatistica, 0)
-
+		validateClusterization(entities)
 		return entities
 	end
 
+	def validateClusterization(entities)
 
+		total = 0
+		entities.each do | ent |
+			total = total + ent.size
+			if (ent.size > 0) then
+				ent.each do | e |
+					Rails.logger.info "#{e[5]} #{e[1]}"
+				end
+				Rails.logger.info "    "
+			end
+
+		end
+		Rails.logger.info "====================="
+		Rails.logger.info "====================="
+		Rails.logger.info "====================="
+		contEnt = 0
+		contNoEnt = 0
+		entities.each do  | ent |
+			if (ent.size > 0) then
+				flag = 0
+				ent.each do | e |
+					ent.each do | d |
+						if (e[1] != d[1])
+							flag = 1
+
+						end
+					end
+					if (flag != 1) then
+					#	Rails.logger.info "#{e[5]} #{e[1]}"
+					end
+
+				end
+				if flag == 0 then
+					contEnt = contEnt+1
+				else
+					contNoEnt = contNoEnt+1
+				end
+				#Rails.logger.info "    "
+			end
+		end
+		vazias = 0
+		entities.each do | ent |
+			if(ent.size == 0) then
+				vazias = vazias + 1
+			end
+
+		end
+
+		ents = total-vazias
+		Rails.logger.info "Total: #{total}"
+		Rails.logger.info "Vazias: #{vazias}"
+		Rails.logger.info "Total de Entidades: #{ents}"
+		Rails.logger.info "Quantidade de entidades que podem ser desambiguadas: #{contEnt}"
+		Rails.logger.info "Quantidade de Entidades que estão sozinhas: #{contNoEnt}"
+		Rails.logger.info "cima batendo com o de baixo"
+
+
+		Rails.logger.info "Entidades Vazias: #{vazias}"
+
+	end
 
 
 end

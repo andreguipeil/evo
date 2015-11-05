@@ -89,20 +89,42 @@ $KCODE = 'UTF8'
 			article = article.gsub('-sua-', '-')
 			article = article.gsub('-seus-', '-')
 			article = article.gsub('-seu-', '-')
+			article = article.gsub('-por-', '-')
 
-			#if  article[0].chr == 'a' and article[1].chr == '-'
-			#	article = article.gsub("a-", '')
-			#end
-			#if article[0].chr == 'o' and article[1].chr == '-'
-			#	article = article.gsub("o-", '')
-			#end
+			article = article.gsub('-of-', '-')
+			article = article.gsub('-from-', '-')
+			article = article.gsub('-the-', '-')
+			article = article.gsub('-to-', '-')
+			article = article.gsub('-at-', '-')
+			article = article.gsub('-her-', '-')
+			article = article.gsub('-who-', '-')
+			article = article.gsub('-that-', '-')
+			article = article.gsub('-with-', '-')
+			article = article.gsub('-not-', '-')
+			article = article.gsub('-no-', '-')
+			article = article.gsub('-them-', '-')
+			article = article.gsub('-more-', '-')
+			article = article.gsub('-like-', '-')
+			article = article.gsub('-as-', '-')
 
-			#if article[0].chr == 'o' and article[1].chr == 's' and article[2].chr == '-'
-			#	article = article.gsub("os-", '')
-			#end
-			#if article[0].chr == 'a' and article[1].chr == 's' and article[2].chr == '-'
-			#	article = article.gsub("as-", '')
-			# end
+
+			if  article[0].chr == 'a' and article[1].chr == '-'
+				article = article.slice(2..article.length)
+			end
+			if article[0].chr == 'o' and article[1].chr == '-'
+				article = article.slice(2..article.length)
+			end
+			if article[0].chr == 'o' and article[1].chr == 's' and article[2].chr == '-'
+				article = article.slice(3..article.length)
+			end
+			if article[0].chr == 'a' and article[1].chr == 's' and article[2].chr == '-'
+				article = article.slice(3..article.length)
+			end
+			if  article[0].chr == 't' and article[1].chr == 'h' and article[2].chr == 'e' and article[3].chr == '-'
+				article = article.slice(4..article.length)
+			end
+
+
 		return article
 	end
 
