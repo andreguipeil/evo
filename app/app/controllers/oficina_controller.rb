@@ -132,22 +132,22 @@ respond_to :html, :json, :js
 		dis = Disambiguation.new
 		case values['rules']
 		when '1' then
-			entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
+			#entitySames = dis.disambiguationByNameAuthor(authorsTemp, values, profilesTemp, articlesTemp)
 		when '2' then
-			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
-			#entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
+			entitySames = dis.disambiguationByArticle(authorsTemp, values)
 			#entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
-			etiquetation = dis.etiquetationByArticle(authorsTemp)
+			#etiquetation = dis.etiquetationByArticle(authorsTemp)
 		when '3' then
-			#entitySamesNoGap = dis.disambiguationByArticleNoGap(authorsTemp, values)
+			entitySames = dis.disambiguationByArticle(authorsTemp, values)
 			#entitySamesWithGap = dis.disambiguationByArticleWithGap(authorsTemp, values)
-			etiquetation = dis.etiquetationByArticle(authorsTemp)
-			# entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
+			#etiquetation = dis.etiquetationByArticle(authorsTemp)
+			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
-		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
+		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
-		arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
-		#arq.createArq(entitySamesNoGap, graphArq+"nogap-result.txt")
+		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
+		arq.createArq(entitySames, graphArq+"-result.txt")
 		#arq.createArq(entitySamesWithGap, graphArq+"withgap-result.txt")
 
 
@@ -324,158 +324,106 @@ respond_to :html, :json, :js
 		end
 
 
+		total = 0
+		total_acertos = 0
+		total_erros = 0
+		certocerto = 0
+		certoerrado = 0
+		erradoerrado = 0
+		iguais = 0
+		levcert = 0
+		leverr = 0
+
 		#logger.info graphArq+"-etiquetation.txt"
-		#if(File.exist?(graphArq+"-etiquetation.txt") == true) then
-			etiquetation = arq.readArq("laburb-etiquetation.txt")
-			resultnogap = arq.readArq(graphArq+"nogap-result.txt")
-			resultwithgap = arq.readArq(graphArq+"withgap-result.txt")
-		#else
-			#logger.info "aqui no etiquetation false"
-			#return respond_with(false);
-		#end
+		if(File.exist?(graphArq+"-etiquetation.txt") == true) then
+			etiquetation = arq.readArq(graphArq+"-etiquetation.txt")
+			result = arq.readArq(graphArq+"-result.txt")
 
-		logger.info " NO GAP"
-		logger.info " ==============================="
-		acertos_total = 0
-		erros_total = 0
-		cont1 = 0
-		cont2 = 0
-		cont3 = 0
-		cont4 = 0
-		etiquetation.zip(resultnogap).each do | et, res |
-			acertos = 0
-			erros = 0
-			et.zip(res).each do | a, b |
-				if(a['et'] == b[3]) then
-					acertos = acertos+1
 
-				else
-					erros = erros+1
-				end
-				case b[4]
-					when 1 then
-						cont1 = cont1+1
-					when 2 then
-						cont2 = cont2+1
-					when 3 then
-						cont3 = cont3+1
-					when 4 then
-						cont4 = cont4+1
-				end
+			result.each do | res |
+				total = total+res.size
 			end
-			#logger.info acertos
-			#logger.info erros
-			#logger.info " -- "
-			acertos_total = acertos_total+acertos
-			erros_total = erros_total+erros
-		end
-		logger.info "Total de Acertos: #{acertos_total}"
-		logger.info "Total de Erros: #{erros_total}"
-		logger.info "Igual: #{cont1}"
-		logger.info "Lev: #{cont2}"
-		logger.info "LevGap: #{cont3}"
-		logger.info "Errados: #{cont4}"
-		logger.info " ==============================="
 
-		logger.info " WITH GAP"
-		logger.info " ==============================="
-		acertos_total = 0
-		erros_total = 0
-		cont1 = 0
-		cont2 = 0
-		cont3 = 0
-		cont4 = 0
-		cont11 = 0
-		cont22 = 0
-		cont33 = 0
-		cont44 = 0
-		etiquetation.zip(resultwithgap).each do | et, res |
-			acertos = 0
-			erros = 0
-			et.zip(res).each do | a, b |
-				if(a['et'] == b[3]) then
-					acertos = acertos+1
-					case b[4]
-						when 1 then
-							cont1 = cont1+1
-						when 2 then
-							cont2 = cont2+1
-						when 3 then
-							cont3 = cont3+1
-						when 4 then
-							cont4 = cont4+1
-					end
-				else
-					erros = erros+1
-					case b[4]
-						when 1 then
-							cont11 = cont11+1
-						when 2 then
-							logger.info "#{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-							cont22 = cont22+1
-						when 3 then
-							cont33 = cont33+1
-						when 4 then
-							cont44 = cont44+1
+			etiquetation.zip(result).each do | et, res |
+				et.zip(res).each do | a, b |
+					if(a['et'] == b[3]) then
+						total_acertos = total_acertos+1
+
+						if(a['et'] == 1) then
+							certocerto = certocerto+1
+						else
+							certoerrado = certoerrado+1
+						end
+
+						case b[4]
+							when 1 then 	# igual
+								iguais = iguais+1
+							when 2 then 	# lev
+								levcert = levcert+1
+								logger.info "CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+							when 3 then 	# gap lev
+								#cont3 = cont3+1
+								#leverr = leverr+1
+							when 4 then 	# errado
+								if(a['et'] != b[3]) then
+									logger.info "ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+									leverr = leverr+1
+								end
+						end
+					else
+						total_erros = total_erros+1
+						erradoerrado = erradoerrado+1
+						logger.info "ERRADO ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
 					end
 				end
-
 			end
-			#logger.info acertos
-			#logger.info erros
-			#logger.info " -- "
-			acertos_total = acertos_total+acertos
-			erros_total = erros_total+erros
+
+
+		else
+			result.each | res |
+				res.each | b |
+					if (b[3] == 1) then
+						certocerto = certocerto+1
+						case b[4]
+							when 1 then 	# igual
+								iguais = iguais+1
+							when 2 then 	# lev
+								levcert = levcert+1
+								logger.info "CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+							when 3 then 	# gap lev
+								#cont3 = cont3+1
+								#leverr = leverr+1
+							when 4 then 	# errado
+								if(a['et'] != b[3]) then
+									logger.info "ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+									leverr = leverr+1
+								end
+						end
+
+					else
+
+					end
+
+				end
+			end
+
+
+
 		end
-		logger.info "Total de Acertos: #{acertos_total}"
-		logger.info "Total de Erros: #{erros_total}"
-		logger.info "ETIQUETAMENTOS CERTOS"
-		logger.info "====================="
-		logger.info "Igual: #{cont1}"
-		logger.info "Lev: #{cont2}"
-		logger.info "LevGap: #{cont3}"
-		logger.info "Errados: #{cont4}"
-		logger.info "ETIQUETAMENTOS ERRADOS"
-		logger.info "====================="
-		logger.info "Igual: #{cont11}"
-		logger.info "Lev: #{cont22}"
-		logger.info "LevGap: #{cont33}"
-		logger.info "Errados: #{cont44}"
-		logger.info " ==============================="
 
+		logger.info " LOG DE DESAMBIGUAÇÃO"
+		logger.info "============================"
+		logger.info " Total de Casamentos: #{total}"
+		logger.info " Total de acertos: #{total_acertos}"
+		logger.info " Total de Erros: #{total_erros}"
+		logger.info " ----"
+		logger.info "Casamentos Certo Certo: #{certocerto}"
+		logger.info "Casamentos Certo Errado: #{certoerrado}"
+		logger.info "Casamentos Errado Errado: #{erradoerrado}"
+		logger.info "Casamentos Exatamente Iguais: #{iguais}"
+		logger.info "Casamentos com leveinstein certos: #{levcert}"
+		logger.info "Casamentos com leveinstein errados: #{leverr}"
 
-		#acertos_total = 0
-		#erros_total = 0
-		#resultnogap.each do | entity |
-		#	erros = 0
-		#	acertos = 0
-		#	entity.each do | same |
-		#		etiquetation.each do | entityEtiquetation |
-		#			entityEtiquetation.each do | sameEt |
-		#
-		#				if( (same[0][2] == sameEt[0][2]) && (same[1][2] == sameEt[1][2]) ) then#								if(same[3] == sameEt['et']) then
-		#							acertos = acertos+1
-		#						else
-		#							erros = erros+1
-		#						end
-							#end
-		#				end
-		#			end
-		#		end
-#
-		#	end
-		#	logger.info acertos
-		#	logger.info erros
-		#	logger.info " -- "
-		#	acertos_total = acertos_total+acertos
-		#	erros_total = erros_total+erros
-		#end
-
-		#logger.info "Acertos: #{acertos_total}"
-		#logger.info "Erros: #{erros_total}"
-
-		#@ret['etiquetation'] = etiquetation
-		#@ret['result'] = result
 		respond_with (@ret = true)
 	end
 

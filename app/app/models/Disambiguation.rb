@@ -291,7 +291,7 @@ class Disambiguation
 # --> Saida: array of desambiguation [element a, element b, value_desambiguation]
 #######################################################
 
-	def disambiguationByArticleNoGap (entities, values)
+	def disambiguationByArticle (entities, values)
 		valueNameAuthor 		= values['name_author'].to_i
 		valueNameAuthorLev 		= values['name_author_lev'].to_f
 		valueNameArticle 		= values['name_article'].to_i
@@ -427,11 +427,9 @@ class Disambiguation
 									same[4] = 4
 									sames.push(same)
 									indexes.push(tempIndex1)
-
 								end
-
 							end
-
+							#vd = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + valueYear + ((valueNameAuthor-levAuthor)**2) + valueRank)
 
 
 						end
@@ -441,37 +439,33 @@ class Disambiguation
 			indexA = indexA+1
 			end
 
-			# estatistica de cada entidade
-			#est['nivel1'] = nivel1
-			#est['nivel2'] = nivel2
-			#est['nivel3'] = nivel3
-			#est['nivel4'] = nivel4
-			#est['nivel5'] = sames.size
-			#est['nivel6'] = nivel6
-			#est['nivel7'] = nivel7
-			#estatistica.push(est);
-			## ====
 
 			if sames.size > 0 then
 				entitySames.push(sames)
 			end
 		end
 
-		Rails.logger.info "Iguais: #{contIguais}"
-		Rails.logger.info "Diferentes: #{contDiferentes}"
-		Rails.logger.info "==== Lev: #{contDiferentesLev}"
-		Rails.logger.info "==== Errados: #{contDiferentesErrados}"
-		#cont = 0
-		#entitySames.each do | same |
-		#	cont += same.size
-		#end
-		#Rails.logger.info cont
-		#fileEstatistica = FileArray.new
-		#fileEstatistica.insertLogFile(estatistica, 1)
-
 		return entitySames
 	end
 
+
+	def formula (weights)
+		valueNameAuthor 		= weights['name_author'].to_i
+		valueNameAuthorLev 		= weights['name_author_lev'].to_f
+		valueNameArticle 		= weights['name_article'].to_i
+		valueNameArticleLev		= weights['name_article_lev'].to_f
+		valueNameConference 		= weights['name_conference'].to_i
+		valueNameConferenceLev 	= weights['name_conference_lev'].to_f
+		valueRank 			= weights['rank'].to_i
+		valueYear 			= weights['year'].to_i
+		valueDisambiguation 		= weights['vd'].to_i
+
+
+
+
+
+		return vd
+	end
 
 #######################################################
 # Cria as triplas e exporta elas em formato .nt
