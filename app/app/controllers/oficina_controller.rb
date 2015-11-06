@@ -16,7 +16,7 @@ require 'linkeddata'
 require 'rdf/ntriples'
 require 'rdf/nquads'
 require 'set'
-
+require 'trigram'
 
 $KCODE = 'UTF8'
 
@@ -144,7 +144,7 @@ respond_to :html, :json, :js
 			#etiquetation = dis.etiquetationByArticle(authorsTemp)
 			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
-		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
+		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
 		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
 		arq.createArq(entitySames, graphArq+"-result.txt")
@@ -333,17 +333,17 @@ respond_to :html, :json, :js
 		iguais = 0
 		levcert = 0
 		leverr = 0
+		rankcert = 0
+
+
+		result = arq.readArq(graphArq+"-result.txt")
+		result.each do | res |
+			total = total+res.size
+		end
 
 		#logger.info graphArq+"-etiquetation.txt"
 		if(File.exist?(graphArq+"-etiquetation.txt") == true) then
 			etiquetation = arq.readArq(graphArq+"-etiquetation.txt")
-			result = arq.readArq(graphArq+"-result.txt")
-
-
-			result.each do | res |
-				total = total+res.size
-			end
-
 			etiquetation.zip(result).each do | et, res |
 				et.zip(res).each do | a, b |
 					if(a['et'] == b[3]) then
@@ -358,12 +358,13 @@ respond_to :html, :json, :js
 						case b[4]
 							when 1 then 	# igual
 								iguais = iguais+1
+								logger.info "Igual #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
 							when 2 then 	# lev
 								levcert = levcert+1
 								logger.info "CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-							when 3 then 	# gap lev
-								#cont3 = cont3+1
-								#leverr = leverr+1
+							when 3 then 	# rank
+								logger.info "RANKK CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0]} == #{b[1]}"
+								rankcert = rankcert+1
 							when 4 then 	# errado
 								if(a['et'] != b[3]) then
 									logger.info "ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
@@ -373,42 +374,46 @@ respond_to :html, :json, :js
 					else
 						total_erros = total_erros+1
 						erradoerrado = erradoerrado+1
-						logger.info "ERRADO ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
+
+
+
+						logger.info "ERRADO ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a[0][4]} #{a[1][4]} #{a['et']} <==> #{b[3]} #{b[0][4]} #{b[1][4]} #{b[0][3]} == #{b[1][3]}"
 					end
 				end
 			end
 
 
 		else
-			result.each | res |
-				res.each | b |
+			result.each do | res |
+				res.each do | b |
 					if (b[3] == 1) then
+						total_acertos = total_acertos+1
 						certocerto = certocerto+1
 						case b[4]
 							when 1 then 	# igual
 								iguais = iguais+1
 							when 2 then 	# lev
 								levcert = levcert+1
-								logger.info "CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-							when 3 then 	# gap lev
-								#cont3 = cont3+1
-								#leverr = leverr+1
-							when 4 then 	# errado
-								if(a['et'] != b[3]) then
-									logger.info "ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-									leverr = leverr+1
-								end
+								logger.info "CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
+							when 3 then 	# rank
+								logger.info "RANKK CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
+								rankcert = rankcert+1
 						end
-
 					else
-
+						if(b[4] == 4) then
+							logger.info "ERRADO MEEEEESMO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
+							erradoerrado = erradoerrado+1
+							total_erros = total_erros+1
+						else
+							logger.info "ERRADO MAS É CONSIDERADO CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
+							certoerrado = certoerrado+1
+							total_acertos = total_acertos+1
+						end
+						#logger.info "ERRADO ERRADO, era pra ser verdadeiro #{b[2]} #{b[1][3]} <==> #{b[0][3]}"
 					end
 
 				end
 			end
-
-
-
 		end
 
 		logger.info " LOG DE DESAMBIGUAÇÃO"
@@ -417,12 +422,12 @@ respond_to :html, :json, :js
 		logger.info " Total de acertos: #{total_acertos}"
 		logger.info " Total de Erros: #{total_erros}"
 		logger.info " ----"
-		logger.info "Casamentos Certo Certo: #{certocerto}"
-		logger.info "Casamentos Certo Errado: #{certoerrado}"
-		logger.info "Casamentos Errado Errado: #{erradoerrado}"
+		logger.info "Casamentos Certo que é Certo: #{certocerto}"
+		logger.info "Casamentos Certo que é Errado: #{certoerrado}"
+		logger.info "Casamentos Errado que é Errado: #{erradoerrado}"
 		logger.info "Casamentos Exatamente Iguais: #{iguais}"
 		logger.info "Casamentos com leveinstein certos: #{levcert}"
-		logger.info "Casamentos com leveinstein errados: #{leverr}"
+		logger.info "Casamentos com rank certos: #{rankcert}"
 
 		respond_with (@ret = true)
 	end

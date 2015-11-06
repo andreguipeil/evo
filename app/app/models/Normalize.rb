@@ -43,6 +43,8 @@ $KCODE = 'UTF8'
 # --> Saida: string
 #######################################################
 	def retireConectives (article)
+		if(article.size > 1) then
+
 			article = article.gsub('-a-', '-')
 			article = article.gsub('-as-', '-')
 			article = article.gsub('-aos-', '-')
@@ -123,7 +125,7 @@ $KCODE = 'UTF8'
 			if  article[0].chr == 't' and article[1].chr == 'h' and article[2].chr == 'e' and article[3].chr == '-'
 				article = article.slice(4..article.length)
 			end
-
+		end
 
 		return article
 	end

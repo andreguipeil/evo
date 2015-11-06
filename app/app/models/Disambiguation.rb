@@ -3,7 +3,7 @@ require 'linkeddata'
 require 'rdf/ntriples'
 require 'rdf/nquads'
 require 'set'
-
+require 'trigram'
 
 
 class Disambiguation
@@ -302,10 +302,6 @@ class Disambiguation
 		valueYear 			= values['year'].to_i
 		valueDisambiguation 		= values['vd'].to_i
 
-		contIguais = 0
-		contDiferentes = 0
-		contDiferentesLev = 0
-		contDiferentesErrados = 0
 		entitiesTemp = entities.dup
 		entitySames = Array.new
 		entitiesTemp.each do | ent |
@@ -327,111 +323,109 @@ class Disambiguation
 						tempIndex2.push(indexA)
 
 						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
-							vd = 0
-							vd += valueNameArticle
+							levAuthor = 0
+							levArticle = 0
+							levConf = 0
+							vYear = 0
+							vRank = 0
+
+							same = Hash.new
+							same[0] = a
+							same[1] = b
+							# IGUAL = CORRETO
 							if(a[3] == b[3]) then
 
-								vd += valueNameAuthor 		# conta o valor do autor
-
-								# rank == rank
-								if (a[4] == b[4]) then
-									vd += valueRank
+								if (a[4] != b[4]) then
+									vRank = valueRank
 								end
-								# conference == conference
-								if(a[6] == b[6]) then
-									vd += valueNameConference
-								else
-									distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-									if distanceConference != nil then
-										vd += valueNameConference
-									end
+								levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+								if levConf == nil then
+									levConf = valueNameConference
 								end
 
-								# year == year
 								if(a[7] == b[7]) then
-									vd += valueYear
+									vYear = valueYear
 								end
-
-								contIguais = contIguais+1
-								same = Hash.new
-								same[0] = a
-								same[1] = b
-								same[2] = vd
+								levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
+								if levArticle == nil then
+									levArticle = valueNameArticle
+								end
 								same[3] = 1
 								same[4] = 1
-								sames.push(same)
-								indexes.push(tempIndex1)
-
 							else
-								contDiferentes = contDiferentes+1
 								distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
-
-
+								# ABAIXO DE LEV = CORRETO
 								if (distance <= valueNameAuthorLev) then
-									contDiferentesLev = contDiferentesLev+1
-									vd += valueNameAuthor 		# conta o valor do autor
-
-									# rank == rank
-									if (a[4] == b[4]) then
-										vd += valueRank
+									if (a[4] != b[4]) then
+										vRank = valueRank
 									end
-									# conference == conference
-									if(a[6] == b[6]) then
-										vd += valueNameConference
-									else
-										distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-										if distanceConference != nil then
-											vd += valueNameConference
-										end
+									levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+									if levConf == nil then
+										levConf = valueNameConference
 									end
 
-									# year == year
 									if(a[7] == b[7]) then
-										vd += valueYear
+										vYear = valueYear
 									end
 
-									same = Hash.new
-									same[0] = a
-									same[1] = b
-									same[2] = vd
+									levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
+									if levArticle == nil then
+										levArticle = valueNameArticle
+									end
+
+									levAuthor = distance
 									same[3] = 1
 									same[4] = 2
-									sames.push(same)
-									indexes.push(tempIndex1)
-								else
-									contDiferentesErrados = contDiferentesErrados+1
-									# rank == rank
-									if (a[4] == b[4]) then
-										vd += valueRank
-									end
-									# conference == conference
-									if(a[6] == b[6]) then
-										vd += valueNameConference
+								else 	# VALOR MAIS ALTO QUE LEV, VERIFICA SE É ABSURDO
+									tri = Trigram.compare(a[3], b[3])
+									if(tri <= 0.3) then
+										Rails.logger.info "#{tri} #{a[3]} #{b[3]}"
+										vRank = 0
+										levAuthor = 3
+										vYear = 0
+										levConf = 3
+										levArticle = 3
+										same[3] = 0
+										same[4] = 5
 									else
-										distanceConference = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-										if distanceConference != nil then
-											vd += valueNameConference
+										Rails.logger.info "#{tri} #{a[3]} #{b[3]}"
+										levAuthor = distance
+										# verifica se o ranking é igual
+										if (a[4] == b[4]) then
+											levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
+											if levConf == nil then
+												levConf = valueNameConference
+											end
+
+											if(a[7] == b[7]) then
+												vYear = valueYear
+											end
+
+											levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
+											if levArticle == nil then
+												levArticle = valueNameArticle
+											end
+											vRank = valueRank
+											same[3] = 1
+											same[4] = 3
+										else
+											vRank = 0
+											levAuthor = 3
+											vYear = 0
+											levConf = 3
+											levArticle = 3
+											same[3] = 0
+											same[4] = 4
 										end
-									end
 
-									# year == year
-									if(a[7] == b[7]) then
-										vd += valueYear
 									end
-
-									same = Hash.new
-									same[0] = a
-									same[1] = b
-									same[2] = vd
-									same[3] = 0
-									same[4] = 4
-									sames.push(same)
-									indexes.push(tempIndex1)
 								end
 							end
-							#vd = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + valueYear + ((valueNameAuthor-levAuthor)**2) + valueRank)
 
-
+							#Rails.logger.info "formula ==> nomeArtigo: #{valueNameArticle} #{levArticle} noeCOnferencia: #{valueNameConference} #{levConf} nameAuthor: #{valueNameAuthor} #{levAuthor} year: #{vYear} rank: #{vRank} "
+							same[2] = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + vYear + ((valueNameAuthor-levAuthor)**2) + vRank)
+							sames.push(same)
+							indexes.push(tempIndex1)
 						end
 					end
 				indexB = indexB+1
@@ -448,24 +442,6 @@ class Disambiguation
 		return entitySames
 	end
 
-
-	def formula (weights)
-		valueNameAuthor 		= weights['name_author'].to_i
-		valueNameAuthorLev 		= weights['name_author_lev'].to_f
-		valueNameArticle 		= weights['name_article'].to_i
-		valueNameArticleLev		= weights['name_article_lev'].to_f
-		valueNameConference 		= weights['name_conference'].to_i
-		valueNameConferenceLev 	= weights['name_conference_lev'].to_f
-		valueRank 			= weights['rank'].to_i
-		valueYear 			= weights['year'].to_i
-		valueDisambiguation 		= weights['vd'].to_i
-
-
-
-
-
-		return vd
-	end
 
 #######################################################
 # Cria as triplas e exporta elas em formato .nt
