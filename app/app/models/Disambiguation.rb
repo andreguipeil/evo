@@ -294,6 +294,7 @@ class Disambiguation
 	def disambiguationByArticle (entities, values)
 		valueNameAuthor 		= values['name_author'].to_i
 		valueNameAuthorLev 		= values['name_author_lev'].to_f
+		valueNameAuthorTri 		= values['name_author_tri'].to_f
 		valueNameArticle 		= values['name_article'].to_i
 		valueNameArticleLev		= values['name_article_lev'].to_f
 		valueNameConference 		= values['name_conference'].to_i
@@ -356,7 +357,7 @@ class Disambiguation
 								distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
 								# ABAIXO DE LEV = CORRETO
 								if (distance <= valueNameAuthorLev) then
-									if (a[4] != b[4]) then
+									if (a[4] == b[4]) then
 										vRank = valueRank
 									end
 									levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
@@ -377,9 +378,9 @@ class Disambiguation
 									same[3] = 1
 									same[4] = 2
 								else 	# VALOR MAIS ALTO QUE LEV, VERIFICA SE É ABSURDO
-									tri = Trigram.compare(a[3], b[3])
-									if(tri <= 0.3) then
-										Rails.logger.info "#{tri} #{a[3]} #{b[3]}"
+
+									if(a[4] == b[4]) then
+
 										vRank = 0
 										levAuthor = 3
 										vYear = 0
@@ -387,11 +388,10 @@ class Disambiguation
 										levArticle = 3
 										same[3] = 0
 										same[4] = 5
-									else
-										Rails.logger.info "#{tri} #{a[3]} #{b[3]}"
-										levAuthor = distance
-										# verifica se o ranking é igual
-										if (a[4] == b[4]) then
+
+										tri = Trigram.compare(a[3], b[3])
+										Rails.logger.info "#{valueNameAuthorTri} #{tri} #{a[3]} #{b[3]} "
+										if(tri <= valueNameAuthorTri) then
 											levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
 											if levConf == nil then
 												levConf = valueNameConference
@@ -418,12 +418,21 @@ class Disambiguation
 											same[4] = 4
 										end
 
+									else
+										vRank = 0
+										levAuthor = 3
+										vYear = 0
+										levConf = 3
+										levArticle = 3
+										same[3] = 0
+										same[4] = 4
 									end
 								end
 							end
 
 							#Rails.logger.info "formula ==> nomeArtigo: #{valueNameArticle} #{levArticle} noeCOnferencia: #{valueNameConference} #{levConf} nameAuthor: #{valueNameAuthor} #{levAuthor} year: #{vYear} rank: #{vRank} "
-							same[2] = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + vYear + ((valueNameAuthor-levAuthor)**2) + vRank)
+							#same[2] = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + vYear + ((valueNameAuthor-levAuthor)**2) + vRank)
+							same[2] = (valueNameArticle-levArticle) + vYear + (valueNameAuthor-levAuthor) + vRank
 							sames.push(same)
 							indexes.push(tempIndex1)
 						end

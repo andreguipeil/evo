@@ -17,6 +17,8 @@ require 'rdf/ntriples'
 require 'rdf/nquads'
 require 'set'
 require 'trigram'
+require 'amatch'
+require 'benchmark'
 
 $KCODE = 'UTF8'
 
@@ -39,6 +41,7 @@ respond_to :html, :json, :js
 		values['vd'] = params[:vd]
 		values['name_author'] = params[:name_author]
 		values['name_author_lev'] = params[:name_author_lev]
+		values['name_author_tri'] = params[:name_author_tri]
 		values['name_article'] = params[:name_article]
 		values['name_article_lev'] = params[:name_article_lev]
 		values['name_conference'] = params[:name_conference]
@@ -62,7 +65,7 @@ respond_to :html, :json, :js
 		# criterio: 3 -> nome do artigo + ano
 		case values['rules']
 			when '1' then
-				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+values['name_author_lev']+values['name_author_tri'].to_s.gsub('.', '')
 			when '2' then
 				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
 			when '3' then
@@ -144,7 +147,7 @@ respond_to :html, :json, :js
 			#etiquetation = dis.etiquetationByArticle(authorsTemp)
 			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
-		#triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
+		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
 		#tri = arq.readArqTriples(graphArq+'.nt')
 		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
 		arq.createArq(entitySames, graphArq+"-result.txt")
@@ -290,6 +293,7 @@ respond_to :html, :json, :js
 		values['vd'] = params[:vd]
 		values['name_author'] = params[:name_author]
 		values['name_author_lev'] = params[:name_author_lev]
+		values['name_author_tri'] = params[:name_author_tri]
 		values['name_article'] = params[:name_article]
 		values['name_article_lev'] = params[:name_article_lev]
 		values['name_conference'] = params[:name_conference]
@@ -392,6 +396,7 @@ respond_to :html, :json, :js
 						case b[4]
 							when 1 then 	# igual
 								iguais = iguais+1
+								logger.info "IGUAL #{b[2]} "
 							when 2 then 	# lev
 								levcert = levcert+1
 								logger.info "CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
@@ -405,7 +410,7 @@ respond_to :html, :json, :js
 							erradoerrado = erradoerrado+1
 							total_erros = total_erros+1
 						else
-							logger.info "ERRADO MAS É CONSIDERADO CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
+							#logger.info "ERRADO MAS É CONSIDERADO CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
 							certoerrado = certoerrado+1
 							total_acertos = total_acertos+1
 						end
@@ -433,47 +438,17 @@ respond_to :html, :json, :js
 	end
 
 
-
-
-
-
-
-
-
 	def navigation
-		graph = params[:graph0]+":"+params[:graph1]
-		q = Query.new
-		query = q.navigation(graph)
-		c = ConnectionSPARQL.new
-		data = c.runQuery(query)
+		 lev = Levenshtein.normalized_distance("marcus-vinicius-pereira-saraiva", "marcus-saraiva")
+		 logger.info lev
 
-		arq = FileArray.new
+		 tri = Trigram.compare("marcus-vinicius-pereira-saraiva", "marcus-saraiva")
+		 logger.info tri
 
-		logger.info graph
-
-		graphArq = graph.gsub('.com', '')
-		graphArq = graphArq.gsub('http://', '')
-		graphArq = graphArq.gsub('www.', '')
-		graphArq = graphArq.gsub('.br', '')
-		graphArq = graphArq.gsub('.org', '')
-		graphArq = graphArq.gsub('.net', '')
-		graphArq = graphArq.gsub('.edu', '')
-		profilesTemp = arq.readArqProfiles(graphArq+'-profiles.txt')
-		contPesquisadores = profilesTemp.size
-		config = arq.readArqConfig(graphArq+"-config.txt")
-		logger.info config
-
-
-		@send = Hash.new
-		@send['graph'] = graph
-		@send['researchers'] = contPesquisadores
-		if(contPesquisadores < 20) then
-			@send['profiles'] = profilesTemp.sort{|a,b| a['name']<=>b['name']}
-		end
-
-		respond_with(@send)
-
-
+		 lev = Levenshtein.normalized_distance("alternativas-potencialidades-desenvolvimento-sistemas-cicloviarios-ufpel", "alternativas-potencialidades-desenvolvimento-sistemas-cicloviarios-ufrgs")
+		 logger.info lev
+		 tri = Trigram.compare("André Peil", "André G. Peil")
+		 logger.info tri
 	end
 
 	def getProfiles
