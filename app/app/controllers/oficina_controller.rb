@@ -65,11 +65,11 @@ respond_to :html, :json, :js
 		# criterio: 3 -> nome do artigo + ano
 		case values['rules']
 			when '1' then
-				graphArq = graphArq+values['rules']+values['name_author_lev']+values['name_author_tri'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')+values['name_author_tri'].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 		end
 
 		if(File.exist?(graphArq+".txt") != true) then
@@ -223,9 +223,9 @@ respond_to :html, :json, :js
 			when '1' then
 				graphArq = graphArq+params[:rules]+params[:name_author_lev].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+				graphArq = graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))+(values[:name_author_tri].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+				graphArq = graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))+(values[:name_author_tri].to_s.gsub('.', ''))
 		end
 
 		tri = arq.readArqTriples(graphArq+'.nt')
@@ -303,8 +303,6 @@ respond_to :html, :json, :js
 		values['rules'] = params[:rules]
 
 
-
-
 		arq = FileArray.new
 		graphArq = graph.gsub('.com', '')
 		graphArq = graphArq.gsub('http://', '')
@@ -322,66 +320,77 @@ respond_to :html, :json, :js
 			when '1' then
 				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+values['rules']+values['name_article_lev'].to_s.gsub('.', '')
+				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 		end
 
+		situacao1 = 0			# IGUAL
+		situacao2 = 0			# LEVESHTEIN
+		situacao3 = 0			# TRIGRAM E RANK
+		situacao4 = 0			# TRIGRAM
+		situacao5 = 0			# RANK
+		situacao6 = 0			# NADA
 
-		total = 0
-		total_acertos = 0
-		total_erros = 0
-		certocerto = 0
-		certoerrado = 0
-		erradoerrado = 0
-		iguais = 0
-		levcert = 0
-		leverr = 0
-		rankcert = 0
-
+		total 	= 0			# TOTAL = CERTOS+ERRADOS (TOTAL DE PAREAMENTOS)
+		certos 	= 0			# QUANTIDADE DE CASAMENTOS CERTOS QUE TEM NA BASE
+		errados = 0			# QUANTIDADE DE CASAMENTOS ERRADOS QUE TEM NA BASE
+		acertou	= 0			# ACERTOS BASEADO NA ETIQUETAGEM
+		errou 	= 0			# ERROS BASEADO NA ETIQUETAGEM
 
 		result = arq.readArq(graphArq+"-result.txt")
 		result.each do | res |
 			total = total+res.size
 		end
 
-		#logger.info graphArq+"-etiquetation.txt"
-		if(File.exist?(graphArq+"-etiquetation.txt") == true) then
-			etiquetation = arq.readArq(graphArq+"-etiquetation.txt")
+		if(File.exist?("laburb3004-etiquetation.txt") == true) then
+			etiquetation = arq.readArq("laburb3004-etiquetation.txt")
 			etiquetation.zip(result).each do | et, res |
 				et.zip(res).each do | a, b |
-					if(a['et'] == b[3]) then
-						total_acertos = total_acertos+1
-
-						if(a['et'] == 1) then
-							certocerto = certocerto+1
-						else
-							certoerrado = certoerrado+1
-						end
-
-						case b[4]
-							when 1 then 	# igual
-								iguais = iguais+1
-								logger.info "Igual #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-							when 2 then 	# lev
-								levcert = levcert+1
-								logger.info "CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-							when 3 then 	# rank
-								logger.info "RANKK CERTO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0]} == #{b[1]}"
-								rankcert = rankcert+1
-							when 4 then 	# errado
-								if(a['et'] != b[3]) then
-									logger.info "ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a['et']} <==> #{b[3]} #{b[0][3]} == #{b[1][3]}"
-									leverr = leverr+1
-								end
-						end
+					# verifica valor real entre certos e errados
+					# ou seja quantos casamentos certos eu tenho e quantos errados
+					if(a['et'] == 1) then
+						certos = certos+1
 					else
-						total_erros = total_erros+1
-						erradoerrado = erradoerrado+1
+						errados = errados+1
+					end
 
+					if(a['et'] == b[3]) then
+						acertou = acertou+1
+					else
+						errou = errou+1
+					end
 
+					#SITUACAO 1
+					if( b[3] == 1 and b[4] == 1 ) then
+						situacao1 = situacao1+1
+					end
+					#SITUACAO 2
+					if( b[3] == 1 and b[4] == 2 ) then
+						situacao2 = situacao2+1
+					end
+					#SITUACAO 3
+					if( b[3] == 1 and b[4] == 3 ) then
+						situacao3 = situacao3+1
+					end
+					#SITUACAO 4
+					if( b[3] == 1 and b[4] == 4 ) then
+						situacao4 = situacao4+1
+						#logger.info "SITUACAO 4"
+						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+					end
+					#SITUACAO 5
+					if( b[3] == 0 and b[4] == 2 ) then
+						if( b[3] != a['et']) then
+							logger.info "SITUACAO 5"
+							logger.info "#{b[0][3] } <==> #{b[1][3]}"
+						end
+						situacao5 = situacao5+1
 
-						logger.info "ERRADO ERRADO #{b[2]} #{a[0][3]} == #{a[1][3]} #{a[0][4]} #{a[1][4]} #{a['et']} <==> #{b[3]} #{b[0][4]} #{b[1][4]} #{b[0][3]} == #{b[1][3]}"
+					end
+					#SITUACAO 6
+					if( b[3] == 0 and b[4] == 3 ) then
+						situacao6 = situacao6+1
 					end
 				end
 			end
@@ -390,33 +399,37 @@ respond_to :html, :json, :js
 		else
 			result.each do | res |
 				res.each do | b |
-					if (b[3] == 1) then
-						total_acertos = total_acertos+1
-						certocerto = certocerto+1
-						case b[4]
-							when 1 then 	# igual
-								iguais = iguais+1
-								logger.info "IGUAL #{b[2]} "
-							when 2 then 	# lev
-								levcert = levcert+1
-								logger.info "CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
-							when 3 then 	# rank
-								logger.info "RANKK CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
-								rankcert = rankcert+1
-						end
-					else
-						if(b[4] == 4) then
-							logger.info "ERRADO MEEEEESMO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
-							erradoerrado = erradoerrado+1
-							total_erros = total_erros+1
-						else
-							#logger.info "ERRADO MAS É CONSIDERADO CERTO #{b[2]} #{b[0][3]} #{b[0][5]}<==> #{b[1][3]} #{b[1][5]}"
-							certoerrado = certoerrado+1
-							total_acertos = total_acertos+1
-						end
-						#logger.info "ERRADO ERRADO, era pra ser verdadeiro #{b[2]} #{b[1][3]} <==> #{b[0][3]}"
+					#SITUACAO 1
+					if( b[3] == 1 and b[4] == 1 ) then
+						situacao1 = situacao1+1
 					end
+					#SITUACAO 2
+					if( b[3] == 1 and b[4] == 2 ) then
+						situacao2 = situacao2+1
+					end
+					#SITUACAO 3
+					if( b[3] == 1 and b[4] == 3 ) then
+						situacao3 = situacao3+1
+					end
+					#SITUACAO 4
+					if( b[3] == 1 and b[4] == 4 ) then
+						situacao4 = situacao4+1
+						logger.info "SITUACAO 4"
+						logger.info "#{b[0][3] } <==> #{b[1][3]}"
+					end
+					#SITUACAO 5
+					if( b[3] == 0 and b[4] == 2 ) then
+						logger.info "SITUACAO 5"
+						logger.info "#{b[0][3] } <==> #{b[1][3]}"
+						situacao5 = situacao5+1
 
+					end
+					#SITUACAO 6
+					if( b[3] == 0 and b[4] == 3 ) then
+						#logger.info "SITUACAO 6"
+						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+						situacao6 = situacao6+1
+					end
 				end
 			end
 		end
@@ -424,15 +437,18 @@ respond_to :html, :json, :js
 		logger.info " LOG DE DESAMBIGUAÇÃO"
 		logger.info "============================"
 		logger.info " Total de Casamentos: #{total}"
-		logger.info " Total de acertos: #{total_acertos}"
-		logger.info " Total de Erros: #{total_erros}"
-		logger.info " ----"
-		logger.info "Casamentos Certo que é Certo: #{certocerto}"
-		logger.info "Casamentos Certo que é Errado: #{certoerrado}"
-		logger.info "Casamentos Errado que é Errado: #{erradoerrado}"
-		logger.info "Casamentos Exatamente Iguais: #{iguais}"
-		logger.info "Casamentos com leveinstein certos: #{levcert}"
-		logger.info "Casamentos com rank certos: #{rankcert}"
+		logger.info " Total de certos: #{certos}"
+		logger.info " Total de Errados: #{errados}"
+		logger.info " Total de Acertos: #{acertou}"
+		logger.info " Total de Erros: #{errou}"
+		logger.info " --- SITUAÇÕES"
+		logger.info "================"
+		logger.info "SITUAÇÃO 1 - IGUAL      = #{situacao1}"
+		logger.info "SITUAÇÃO 2 - LEVES     = #{situacao2}"
+		logger.info "SITUAÇÃO 3 - TRIGRA    = #{situacao3}"
+		logger.info "SITUAÇÃO 4 - AVALIAR  = #{situacao4}"
+		logger.info "SITUAÇÃO 5 - AVALIAR  = #{situacao5}"
+		logger.info "SITUAÇAO 6 - ERRADOS =#{situacao6}"
 
 		respond_with (@ret = true)
 	end

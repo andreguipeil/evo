@@ -324,11 +324,13 @@ class Disambiguation
 						tempIndex2.push(indexA)
 
 						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
-							levAuthor = 0
-							levArticle = 0
-							levConf = 0
-							vYear = 0
-							vRank = 0
+							resAuthorLev = 0
+							resAuthorTri  = 0
+							resRank = 0
+							resYear = 0
+							resArticleLev = 0
+							resAuthor = valueNameAuthor
+							resArticle = valueNameArticle
 
 							same = Hash.new
 							same[0] = a
@@ -336,103 +338,91 @@ class Disambiguation
 							# IGUAL = CORRETO
 							if(a[3] == b[3]) then
 
-								if (a[4] != b[4]) then
-									vRank = valueRank
-								end
-								levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-								if levConf == nil then
-									levConf = valueNameConference
+								if (a[4] == b[4]) then
+									resRank = valueRank
 								end
 
-								if(a[7] == b[7]) then
-									vYear = valueYear
-								end
-								levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
-								if levArticle == nil then
-									levArticle = valueNameArticle
-								end
+								resAuthorTri = 0
+								resAuthorLev = 0
+
 								same[3] = 1
 								same[4] = 1
 							else
-								distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
+								distance = Levenshtein.normalized_distance(a[3], b[3]) 					# verifica a distancia do author
+								resAuthorLev = distance
 								# ABAIXO DE LEV = CORRETO
 								if (distance <= valueNameAuthorLev) then
+
 									if (a[4] == b[4]) then
-										vRank = valueRank
-									end
-									levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-									if levConf == nil then
-										levConf = valueNameConference
+										resRank = valueRank
 									end
 
-									if(a[7] == b[7]) then
-										vYear = valueYear
-									end
+									resAuthorTri = 0
 
-									levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
-									if levArticle == nil then
-										levArticle = valueNameArticle
-									end
-
-									levAuthor = distance
 									same[3] = 1
 									same[4] = 2
 								else 	# VALOR MAIS ALTO QUE LEV, VERIFICA SE É ABSURDO
 
-									if(a[4] == b[4]) then
-
-										vRank = 0
-										levAuthor = 3
-										vYear = 0
-										levConf = 3
-										levArticle = 3
-										same[3] = 0
-										same[4] = 5
-
-										tri = Trigram.compare(a[3], b[3])
-										Rails.logger.info "#{valueNameAuthorTri} #{tri} #{a[3]} #{b[3]} "
-										if(tri <= valueNameAuthorTri) then
-											levConf = Levenshtein.normalized_distance(a[6], b[6], valueNameConferenceLev) # verifica a distancia do author
-											if levConf == nil then
-												levConf = valueNameConference
-											end
-
-											if(a[7] == b[7]) then
-												vYear = valueYear
-											end
-
-											levArticle = Levenshtein.normalized_distance(a[6], b[6], valueNameArticleLev) # verifica a distancia do author
-											if levArticle == nil then
-												levArticle = valueNameArticle
-											end
-											vRank = valueRank
+									tri = Trigram.compare(a[3], b[3])
+									if(tri >= valueNameAuthorTri) then
+										if (a[4] == b[4]) then
+											resRank = valueRank
 											same[3] = 1
 											same[4] = 3
 										else
-											vRank = 0
-											levAuthor = 3
-											vYear = 0
-											levConf = 3
-											levArticle = 3
-											same[3] = 0
+											same[3] = 1
 											same[4] = 4
 										end
-
 									else
-										vRank = 0
-										levAuthor = 3
-										vYear = 0
-										levConf = 3
-										levArticle = 3
-										same[3] = 0
-										same[4] = 4
+										# qualifica o ranking
+										if (a[4] == b[4]) then
+											resRank = valueRank
+											same[3] = 0
+											same[4] = 2
+										else
+											same[3] = 0
+											same[4] = 3
+
+										end
+
+										if(a[7] == b[7]) then
+											resYear = valueYear
+										end
+
+										levArticle = Levenshtein.normalized_distance(a[5], b[5], valueNameArticleLev) 	# verifica a distancia do artigo
+										if levArticle != nil then
+											resArticleLev = levArticle
+										end
 									end
+									resAuthorTri = tri
+									resAuthorTri = 1-resAuthorTri
 								end
 							end
 
+							if(a[7] == b[7]) then
+								resYear = valueYear
+							end
+
+							levArticle = Levenshtein.normalized_distance(a[5], b[5], valueNameArticleLev) 	# verifica a distancia do artigo
+							if levArticle != nil then
+								resArticleLev = levArticle
+							end
+
+							pondNameAuthor = valueNameAuthor/2.0
+							resAuthorTri = pondNameAuthor*resAuthorTri
+							#Rails.logger.info "Trigram #{resAuthorTri}"
+							#Rails.logger.info "Lev ANTES #{resAuthorLev}"
+							resAuthorLev = pondNameAuthor*resAuthorLev
+							#Rails.logger.info "Lev #{resAuthorLev}"
+
+							resArticleLev = valueNameArticle*valueNameArticleLev
+
 							#Rails.logger.info "formula ==> nomeArtigo: #{valueNameArticle} #{levArticle} noeCOnferencia: #{valueNameConference} #{levConf} nameAuthor: #{valueNameAuthor} #{levAuthor} year: #{vYear} rank: #{vRank} "
 							#same[2] = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + vYear + ((valueNameAuthor-levAuthor)**2) + vRank)
-							same[2] = (valueNameArticle-levArticle) + vYear + (valueNameAuthor-levAuthor) + vRank
+							#Rails.logger.info "#{a[3]} <==> #{b[3]}"
+							#Rails.logger.info "Formula: ( #{valueNameAuthor} - #{resAuthorLev} - #{resAuthorTri}  ) + #{resRank} + ( #{valueNameArticle} - #{resArticleLev} ) + #{resYear}"
+							same[2] = ((valueNameAuthor - resAuthorLev) - resAuthorTri) + resRank + (valueNameArticle - resArticleLev) + resYear
+							#Rails.logger.info "#{same[2]}"
 							sames.push(same)
 							indexes.push(tempIndex1)
 						end
