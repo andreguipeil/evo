@@ -144,7 +144,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"rafaela-barros-pinho", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37797648"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"ivan-ribeiro-kullhoff", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37798800"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34919648"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>1, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34919648"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"lais-dellighausen-portela", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34920800"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"rafaela-barros-pinho", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34921968"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"cristiane-santos-nunes", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-7158172139308069"}}
@@ -319,9 +319,9 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31839872", 3=>"eduardo-rocha"}, "et"=>1, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31839872", 3=>"eduardo-rocha"}, "et"=>0, 1=>{3=>"barbara-barbara-hypolito", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37739984"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/2809172806147764#author-idp37056896"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"debora-souto-allemand", 2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>1, 1=>{3=>"debora-souto-allemand", 2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"barbara-hypolito", 2=>"http://ufpel.edu.br/lattes/2809172806147764#author-idp37061744"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"debora-souto-allemand", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37735056"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>1, 1=>{3=>"debora-souto-allemand", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37735056"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-idp31841024", 3=>"debora-allemand"}, "et"=>0, 1=>{3=>"barbara-barbara-hypolito", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37739984"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/0741704260227015#author-0741704260227015", 3=>"barbara-barbara-hypolito"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/2809172806147764#author-idp37056896"}}
@@ -1194,7 +1194,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37780544", 3=>"ivan-ribeiro-kullhoff"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34908032"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37781808", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"cristiane-santos-nunes", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-7158172139308069"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37781808", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"ivan-kuhlhoff", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34905616"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37781808", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34906880"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37781808", 3=>"debora-souto-allemand"}, "et"=>1, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34906880"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp37781808", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34908032"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261", 3=>"eduardo-rocha"}, "et"=>0, 1=>{3=>"cristiane-santos-nunes", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-7158172139308069"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261", 3=>"eduardo-rocha"}, "et"=>0, 1=>{3=>"ivan-kuhlhoff", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34905616"}}
@@ -1836,7 +1836,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37392080"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37398448"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"lucas-boeira-bittencourt", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-5334168356219435"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"carolina-barros", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37403008"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>1, 1=>{3=>"carolina-barros", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37403008"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"ivan-ribeiro-kuhlhoff", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37404192"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"luana-pavan-detoni", 2=>"http://ufpel.edu.br/lattes/5334168356219435#author-idp37405376"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1703526475128461#author-idp12930480", 3=>"carolina-mendonca-fernandes-barros"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261"}}
@@ -2847,7 +2847,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"ivan-kuhlhoff", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34889872"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"luana-detoni", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34891024"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"lucas-bittencourt", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34892176"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34893440"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>1, 1=>{3=>"debora-allemand", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34893440"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"cristiane-santos-nunes", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-7158172139308069"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-2809172806147764", 3=>"debora-souto-allemand"}, "et"=>0, 1=>{3=>"carolina-barros", 2=>"http://ufpel.edu.br/lattes/7158172139308069#author-idp34895648"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/2809172806147764#author-idp37090240", 3=>"cristiane-nunes"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261"}}
@@ -3159,7 +3159,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"mauricio-couto-polidori", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10335696"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"otavio-martins-peres", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-3623706033011018"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"marcus-saraiva", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10340208"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"cristiano-toralles", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10341392"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>1, 1=>{3=>"cristiano-toralles", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10341392"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"fernanda-tomiello", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10342544"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"mauricio-couto-polidori", 2=>"http://ufpel.edu.br/lattes/5251871279558601#author-5251871279558601"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26295856", 3=>"christiano-piccioni-toralles"}, "et"=>0, 1=>{3=>"otavio-martins-peres", 2=>"http://ufpel.edu.br/lattes/5251871279558601#author-idp33895328"}}
@@ -3468,7 +3468,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>0, 1=>{3=>"fernanda-tomiello", 2=>"http://ufpel.edu.br/lattes/5251871279558601#author-idp33669040"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>0, 1=>{3=>"mauricio-couto-polidori", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp6022224"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>0, 1=>{3=>"otavio-martins-peres", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp6026784"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>0, 1=>{3=>"marcus-vinicius-pereira-saraiva", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-7643651198705918"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>1, 1=>{3=>"marcus-vinicius-pereira-saraiva", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-7643651198705918"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-idp26224832", 3=>"marcus-saraiva"}, "et"=>0, 1=>{3=>"fernanda-tomiello", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp6027968"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-1770912662486261", 3=>"fernanda-tomiello"}, "et"=>0, 1=>{3=>"mauricio-couto-polidori", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-idp10447696"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/1770912662486261#author-1770912662486261", 3=>"fernanda-tomiello"}, "et"=>0, 1=>{3=>"otavio-martins-peres", 2=>"http://ufpel.edu.br/lattes/3623706033011018#author-3623706033011018"}}
@@ -4218,7 +4218,7 @@
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>0, 1=>{3=>"marcus-vinicius-pereira-saraiva", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-7643651198705918"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>0, 1=>{3=>"gabriel-silva-fernandes", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5989072"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>0, 1=>{3=>"jeremias-formolo", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5990032"}}
-{0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>0, 1=>{3=>"roberta-taborda-santa-catharina", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5991216"}}
+{0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>1, 1=>{3=>"roberta-taborda-santa-catharina", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5991216"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-idp36941728", 3=>"roberta-santa-catharina"}, "et"=>0, 1=>{3=>"eduardo-rocha", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5992416"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261", 3=>"eduardo-rocha"}, "et"=>0, 1=>{3=>"marcus-vinicius-pereira-saraiva", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-7643651198705918"}}
 {0=>{2=>"http://ufpel.edu.br/lattes/6927803856702261#author-6927803856702261", 3=>"eduardo-rocha"}, "et"=>0, 1=>{3=>"gabriel-silva-fernandes", 2=>"http://ufpel.edu.br/lattes/7643651198705918#author-idp5989072"}}
