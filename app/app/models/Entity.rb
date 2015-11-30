@@ -129,6 +129,7 @@ class Entity
 		estatistica = Array.new 					# array estatistica possui todos os dados estatisticos que vão para o log
 		est = Hash.new							# cria uma hash para declarar os dados estaticos atraves de nome
 		est['numero_triplas'] = triples.size				# faz a conta do numero de triplas que vem do banco
+
 		Benchmark.bm do | x |
 			Rails.logger.info x.report("By Article/Year") {
 				entityYear  = Hash.new 					# varre nas triplas a quantidade de anos diferentes para poder clusterizar
@@ -177,10 +178,33 @@ class Entity
 				}
 			}
 		end
-		#est['contClusterizacao'] = contClusterizacao
-		#estatistica.push(est)
-		#fileEstatistica = FileArray.new
-		#fileEstatistica.insertLogFile(estatistica, 0)
+		entidades = Array.new
+
+		entities.each do | en |
+			article = 0
+			ent = Array.new
+			en.each do | e |
+				if (!ent.include? e[1]) then
+					ent.push(e[1])
+					Rails.logger.info "#{e[1]}"
+					article = article+1
+				end
+			end
+			entidades.push(ent)
+			Rails.logger.info "   "
+		end
+
+		somatorio = 0
+		cont = 0
+		entidades.each do | e |
+			if(e.size > 1)
+				somatorio = somatorio+e.size
+				cont = cont+1
+			end
+		end
+		Rails.logger.info "#{somatorio}"
+		Rails.logger.info "#{cont}"
+
 		validateClusterization(entities)
 		return entities
 	end

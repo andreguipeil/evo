@@ -67,9 +67,11 @@ respond_to :html, :json, :js
 			when '1' then
 				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')+values['name_author_tri'].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
+				graphArq = graphArq+values['rules']+(values['name_article_lev'].to_s.gsub('.', ''))
+				graphArq2 = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
+				graphArq = graphArq+values['rules']+(values['name_article_lev'].to_s.gsub('.', ''))
+				graphArq2 = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 		end
 
 		if(File.exist?(graphArq+".txt") != true) then
@@ -105,6 +107,7 @@ respond_to :html, :json, :js
 			# =========
 			# STEP 3 - create similar articles block's
 			# =========
+			logger.info "#{authors.size}"
 			entities = Entity.new
 			clustersArt = Hash.new						#
 			case values['rules']
@@ -148,9 +151,9 @@ respond_to :html, :json, :js
 			#entitySames = dis.disambiguationByArticleYear(authorsTemp, values)
 		end
 		triples = dis.createTriples(entitySames, graphArq+'.nt')			#cria as triplas em um arquivo .nt
-		#tri = arq.readArqTriples(graphArq+'.nt')
+		tri = arq.readArqTriples(graphArq+'.nt')
 		#arq.createArq(etiquetation, graphArq+"-etiquetation.txt")
-		arq.createArq(entitySames, graphArq+"-result.txt")
+		arq.createArq(entitySames, graphArq2+"-result.txt")
 		#arq.createArq(entitySamesWithGap, graphArq+"withgap-result.txt")
 
 
@@ -225,8 +228,10 @@ respond_to :html, :json, :js
 			when '2' then
 				graphArq = graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))+(values[:name_author_tri].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))+(values[:name_author_tri].to_s.gsub('.', ''))
+				graphArq =  graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))
 		end
+
+		logger.info graphArq
 
 		tri = arq.readArqTriples(graphArq+'.nt')
 
@@ -265,7 +270,7 @@ respond_to :html, :json, :js
 			when '2' then
 				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
 			when '3' then
-				graphArq = graphArq+params[:rules]+params[:name_article_lev].to_s.gsub('.', '')
+				graphArq =  graphArq+params[:rules]+(params[:name_article_lev].to_s.gsub('.', ''))
 		end
 
 		tri = arq.readArqTriples(graphArq+'.nt')
@@ -320,33 +325,52 @@ respond_to :html, :json, :js
 			when '1' then
 				graphArq = graphArq+values['rules']+values['name_author_lev'].to_s.gsub('.', '')
 			when '2' then
-				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
+				graphArq = graphArq+values['rules']+(values['name_article_lev'].to_s.gsub('.', ''))+values['rules']+(values['name_article_lev'].to_s.gsub('.', ''))+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 			when '3' then
-				graphArq = graphArq+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
+				graphArq = graphArq+values['rules']+(values['name_article_lev'].to_s.gsub('.', ''))+values['rules']+(values['name_author_lev'].to_s.gsub('.', ''))+(values['name_author_tri'].to_s.gsub('.', ''))
 		end
 
 		situacao1 = 0			# IGUAL
-		situacao2 = 0			# LEVESHTEIN
-		situacao3 = 0			# TRIGRAM E RANK
-		situacao4 = 0			# TRIGRAM
-		situacao5 = 0			# RANK
-		situacao6 = 0			# NADA
+		situacao2 = 0			# TRIGRAM E RANK
+		situacao3 = 0			# TRIGRAM
+		situacao4 = 0			# RANK
+		situacao5 = 0			# NADA
+
+		situacao1erros = 0
+		situacao2erros = 0
+		situacao3erros = 0
+		situacao4erros = 0
+		situacao5erros = 0
+
+		media = Hash.new
+		media['geral'] = []
+		media['situacao1'] = []
+		media['situacao2'] = []
+		media['situacao3'] = []
+		media['situacao4'] = []
+		media['situacao5'] = []
 
 		total 	= 0			# TOTAL = CERTOS+ERRADOS (TOTAL DE PAREAMENTOS)
 		certos 	= 0			# QUANTIDADE DE CASAMENTOS CERTOS QUE TEM NA BASE
 		errados = 0			# QUANTIDADE DE CASAMENTOS ERRADOS QUE TEM NA BASE
 		acertou	= 0			# ACERTOS BASEADO NA ETIQUETAGEM
 		errou 	= 0			# ERROS BASEADO NA ETIQUETAGEM
-
+		logger.info graphArq
 		result = arq.readArq(graphArq+"-result.txt")
 		result.each do | res |
 			total = total+res.size
 		end
 
-		if(File.exist?("laburb3004-etiquetation.txt") == true) then
-			etiquetation = arq.readArq("laburb3004-etiquetation.txt")
+		if(File.exist?("gaci3004-etiquetation.txt") == true) then
+			etiquetation = arq.readArq("gaci3004-etiquetation.txt")
+
 			etiquetation.zip(result).each do | et, res |
+
 				et.zip(res).each do | a, b |
+
+					media['geral'].push(b[2])
+					#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+					#logger.info "#{b[2]}"
 					# verifica valor real entre certos e errados
 					# ou seja quantos casamentos certos eu tenho e quantos errados
 					if(a['et'] == 1) then
@@ -363,72 +387,129 @@ respond_to :html, :json, :js
 
 					#SITUACAO 1
 					if( b[3] == 1 and b[4] == 1 ) then
+						media['situacao1'].push(b[2])
 						situacao1 = situacao1+1
+						if( b[3] != a['et']) then
+							situacao1erros=situacao1erros+1
+							#tri = Trigram.compare(a[0][3], a[1][3])
+							#logger.info "#{tri}"
+							#logger.info "SITUACAO 4"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "SITUACAO 4 ERRADA"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "#{b[0][2] } <==> #{b[1][2]}"
+
+						end
 					end
 					#SITUACAO 2
 					if( b[3] == 1 and b[4] == 2 ) then
+						media['situacao2'].push(b[2])
 						situacao2 = situacao2+1
+						if( b[3] != a['et']) then
+							#logger.info "SITUACAO 2"
+							#logger.info "#{b[3]} #{a['et']}"
+							logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							tri = Trigram.compare(a[0][3], a[1][3])
+							logger.info "#{tri}"
+							#logger.info "#{b[0][2] } <==> #{b[1][2]}"
+							situacao2erros=situacao2erros+1
+						end
 					end
 					#SITUACAO 3
 					if( b[3] == 1 and b[4] == 3 ) then
+						media['situacao3'].push(b[2])
 						situacao3 = situacao3+1
+
+						if( b[3] != a['et']) then
+							situacao3erros=situacao3erros+1
+							#logger.info "SITUACAO 3 ERRADA"
+							#logger.info "#{b[3]} #{a['et']}"
+							logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "#{b[0][2] } <==> #{b[1][2]}"
+							#tri = Trigram.compare(a[0][3], a[1][3])
+							#logger.info "#{tri}"
+							tri = Trigram.compare(a[0][3], a[1][3])
+							logger.info "#{tri}"
+							#logger.info "SITUACAO 3"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "#{b[0][2] } <==> #{b[1][2]}"
+						end
 					end
 					#SITUACAO 4
-					if( b[3] == 1 and b[4] == 4 ) then
+					if( b[3] == 0 and b[4] == 4 ) then
+						media['situacao4'].push(b[2])
 						situacao4 = situacao4+1
+						if( b[3] != a['et']) then
+							situacao4erros=situacao4erros+1
+							#tri = Trigram.compare(a[0][3], a[1][3])
+							#logger.info "#{tri}"
+							#logger.info "SITUACAO 4"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "SITUACAO 4 ERRADA"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							#logger.info "#{b[0][2] } <==> #{b[1][2]}"
+
+						end
 						#logger.info "SITUACAO 4"
 						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
 					end
 					#SITUACAO 5
-					if( b[3] == 0 and b[4] == 2 ) then
+					if( b[3] == 0 and b[4] == 5 ) then
+						media['situacao5'].push(b[2])
 						if( b[3] != a['et']) then
-							logger.info "SITUACAO 5"
-							logger.info "#{b[0][3] } <==> #{b[1][3]}"
+							situacao5erros = situacao5erros+1
+							#tri = Trigram.compare(a[0][3], a[1][3])
+							#logger.info "#{tri}"
+							#logger.info "SITUACAO 5"
+							#logger.info "#{b[0][3] } <==> #{b[1][3]}"
 						end
 						situacao5 = situacao5+1
-
-					end
-					#SITUACAO 6
-					if( b[3] == 0 and b[4] == 3 ) then
-						situacao6 = situacao6+1
 					end
 				end
-			end
 
+
+			end
 
 		else
 			result.each do | res |
 				res.each do | b |
+					media['geral'].push(b[2])
 					#SITUACAO 1
 					if( b[3] == 1 and b[4] == 1 ) then
+						media['situacao1'].push(b[2])
 						situacao1 = situacao1+1
 					end
 					#SITUACAO 2
 					if( b[3] == 1 and b[4] == 2 ) then
+						media['situacao2'].push(b[2])
 						situacao2 = situacao2+1
 					end
 					#SITUACAO 3
 					if( b[3] == 1 and b[4] == 3 ) then
+						media['situacao3'].push(b[2])
 						situacao3 = situacao3+1
+						#logger.info "#{b[0][2] } <==> #{b[1][2]}"
 					end
 					#SITUACAO 4
-					if( b[3] == 1 and b[4] == 4 ) then
+					if( b[3] == 0 and b[4] == 4 ) then
+						media['situacao4'].push(b[2])
 						situacao4 = situacao4+1
-						logger.info "SITUACAO 4"
-						logger.info "#{b[0][3] } <==> #{b[1][3]}"
+						#tri = Trigram.compare(b[0][3], b[1][3])
+						#if(tri < 0.5 and tri > 0.3)
+						#	logger.info "SITUACAO 4 ERRADA"
+						#	logger.info "#{tri}"
+						#	logger.info "#{b[0][3] } <==> #{b[1][3]}"
+						#end
+						#logger.info "SITUACAO 4"
+						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
 					end
 					#SITUACAO 5
-					if( b[3] == 0 and b[4] == 2 ) then
-						logger.info "SITUACAO 5"
-						logger.info "#{b[0][3] } <==> #{b[1][3]}"
+					if( b[3] == 0 and b[4] == 5 ) then
+						media['situacao5'].push(b[2])
+						#logger.info "SITUACAO 5"
+						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
 						situacao5 = situacao5+1
 
-					end
-					#SITUACAO 6
-					if( b[3] == 0 and b[4] == 3 ) then
-						#logger.info "SITUACAO 6"
-						#logger.info "#{b[0][3] } <==> #{b[1][3]}"
-						situacao6 = situacao6+1
 					end
 				end
 			end
@@ -436,6 +517,8 @@ respond_to :html, :json, :js
 
 		logger.info " LOG DE DESAMBIGUAÇÃO"
 		logger.info "============================"
+		logger.info " Nivel de Levenshtein: #{values['name_author_lev']}"
+		logger.info " Total de Trigram: #{values['name_author_tri']}"
 		logger.info " Total de Casamentos: #{total}"
 		logger.info " Total de certos: #{certos}"
 		logger.info " Total de Errados: #{errados}"
@@ -443,27 +526,104 @@ respond_to :html, :json, :js
 		logger.info " Total de Erros: #{errou}"
 		logger.info " --- SITUAÇÕES"
 		logger.info "================"
-		logger.info "SITUAÇÃO 1 - IGUAL      = #{situacao1}"
-		logger.info "SITUAÇÃO 2 - LEVES     = #{situacao2}"
-		logger.info "SITUAÇÃO 3 - TRIGRA    = #{situacao3}"
-		logger.info "SITUAÇÃO 4 - AVALIAR  = #{situacao4}"
-		logger.info "SITUAÇÃO 5 - AVALIAR  = #{situacao5}"
-		logger.info "SITUAÇAO 6 - ERRADOS =#{situacao6}"
+		logger.info "SITUAÇÃO 1 - IGUAL		= #{situacao1} ERROS: #{situacao1erros}"
+		logger.info "SITUAÇÃO 2 - TRIGRA  + RANK	= #{situacao2} ERROS: #{situacao2erros}"
+		logger.info "SITUAÇÃO 3 - TRIGRA		= #{situacao3} ERROS: #{situacao3erros}"
+		logger.info "SITUAÇÃO 4 - RANK 		= #{situacao4} ERROS: #{situacao4erros}"
+		logger.info "SITUAÇÃO 5 - ERRADOS		= #{situacao5} ERROS: #{situacao5erros}"
+		logger.info "========================================================="
+		logger.info "========================================================="
+		logger.info "========================================================="
+
+		mg = 0
+
+		logger.info "================"
+		media['geral'].each do | m |
+			mg = mg+m
+			#logger.info "#{m}"
+		end
+		logger.info "================"
+		mediageral = mg/media['geral'].size
+		logger.info "MEDIA GERAL 	= #{mediageral}	=== 	Tam: #{media['geral'].size}"
+		#logger.info "#{media['geral'].minmax}"
+
+		## ============
+
+		st1 = 0
+		media['situacao1'].each do | s |
+			st1 = st1+s
+			#logger.info "#{s}"
+		end
+		logger.info "================"
+		sit1 = st1/media['situacao1'].size
+		logger.info "SITUACAO 1 	= #{sit1}		=== 	Tam: #{media['situacao1'].size}"
+		logger.info "#{media['situacao1'].minmax}"
+		#=============
+
+		st2 = 0
+		media['situacao2'].each do | s |
+			st2 = st2+s
+			#logger.info "#{s}"
+		end
+		logger.info "================"
+		sit2 = st2/media['situacao2'].size
+		logger.info "SITUACAO 2 	= #{sit2}		=== 	Tam: #{media['situacao2'].size}"
+		logger.info "#{media['situacao2'].minmax}"
+		#=============
+
+		st3 = 0
+		media['situacao3'].each do | s |
+			st3 = st3+s
+			#logger.info "#{s}"
+		end
+		sit3 = st3/media['situacao3'].size
+
+
+		logger.info "================"
+		logger.info "SITUACAO 3 	= #{sit3} 	=== 	Tam: #{media['situacao3'].size}"
+		logger.info "#{media['situacao3'].minmax}"
+
+
+		#=============
+
+		st4 = 0
+		media['situacao4'].each do | s |
+			st4 = st4+s
+			#logger.info "#{s}"
+		end
+		logger.info "================"
+		sit4 = st4/media['situacao4'].size
+		logger.info "SITUACAO 4 	= #{sit4}		=== 	Tam: #{media['situacao4'].size}"
+		logger.info "#{media['situacao4'].minmax}"
+		#==============
+
+
+		st5 = 0
+		media['situacao5'].each do | s |
+			st5 = st5+s
+			#logger.info "#{s}"
+		end
+		logger.info "================"
+		sit5 = st5/media['situacao5'].size
+		logger.info "SITUACAO 5 	= #{sit5} 	=== 	Tam: #{media['situacao5'].size}"
+		logger.info "#{media['situacao5'].minmax}"
+		#==============
+		logger.info "========================================================="
+
+
 
 		respond_with (@ret = true)
 	end
 
 
 	def navigation
-		 lev = Levenshtein.normalized_distance("marcus-vinicius-pereira-saraiva", "marcus-saraiva")
+		 lev = Trigram.compare("vinicius-n-possani", "vinicius-callegaro")
 		 logger.info lev
 
-		 tri = Trigram.compare("marcus-vinicius-pereira-saraiva", "marcus-saraiva")
+		 tri = Trigram.compare("juliano-lucas-goncalve", "robson-goncalves")
 		 logger.info tri
 
-		 lev = Levenshtein.normalized_distance("alternativas-potencialidades-desenvolvimento-sistemas-cicloviarios-ufpel", "alternativas-potencialidades-desenvolvimento-sistemas-cicloviarios-ufrgs")
-		 logger.info lev
-		 tri = Trigram.compare("André Peil", "André G. Peil")
+		 tri = Trigram.compare("ivan-saraiva", "ivan-silva")
 		 logger.info tri
 	end
 

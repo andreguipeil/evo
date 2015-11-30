@@ -37,7 +37,7 @@ class Disambiguation
 
 						if(!((indexes.include?(tempIndex1)) || (indexes.include?(tempIndex2)))) then 			# verifica se na tabela de indexes tem a ocorencia da desambiguacao, para evitar duplicacao
 							same = Hash.new
-							distance = Levenshtein.normalized_distance(a[3], b[3]) 				# verifica a distancia do author
+							distance = Trigram.compare(a[3], b[3]) 				# verifica a distancia do author
 
 
 							ha = Hash.new
@@ -47,10 +47,10 @@ class Disambiguation
 							hb[3] = b[3]
 							hb[2] = b[2]
 							same[0] = ha
-							if (distance <= 0.01) then
-								same['et'] = 1
-							else
+							if (distance <= 0.35) then
 								same['et'] = 0
+							else
+								same['et'] = 1
 							end
 							same[1] = hb
 
@@ -348,55 +348,40 @@ class Disambiguation
 								same[3] = 1
 								same[4] = 1
 							else
-								distance = Levenshtein.normalized_distance(a[3], b[3]) 					# verifica a distancia do author
-								resAuthorLev = distance
-								# ABAIXO DE LEV = CORRETO
-								if (distance <= valueNameAuthorLev) then
-
+								tri = Trigram.compare(a[3], b[3])
+								if(tri >= valueNameAuthorTri) then
 									if (a[4] == b[4]) then
 										resRank = valueRank
-									end
-
-									resAuthorTri = 0
-
-									same[3] = 1
-									same[4] = 2
-								else 	# VALOR MAIS ALTO QUE LEV, VERIFICA SE É ABSURDO
-
-									tri = Trigram.compare(a[3], b[3])
-									if(tri >= valueNameAuthorTri) then
-										if (a[4] == b[4]) then
-											resRank = valueRank
-											same[3] = 1
-											same[4] = 3
-										else
-											same[3] = 1
-											same[4] = 4
-										end
+										same[3] = 1
+										same[4] = 2
 									else
-										# qualifica o ranking
-										if (a[4] == b[4]) then
-											resRank = valueRank
-											same[3] = 0
-											same[4] = 2
-										else
-											same[3] = 0
-											same[4] = 3
-
-										end
-
-										if(a[7] == b[7]) then
-											resYear = valueYear
-										end
-
-										levArticle = Levenshtein.normalized_distance(a[5], b[5], valueNameArticleLev) 	# verifica a distancia do artigo
-										if levArticle != nil then
-											resArticleLev = levArticle
-										end
+										same[3] = 1
+										same[4] = 3
 									end
-									resAuthorTri = tri
-									resAuthorTri = 1-resAuthorTri
+								else
+									# qualifica o ranking
+									if (a[4] == b[4]) then
+										resRank = valueRank
+										same[3] = 0
+										same[4] = 4
+									else
+										same[3] = 0
+										same[4] = 5
+
+									end
+
+									if(a[7] == b[7]) then
+										resYear = valueYear
+									end
+
+									levArticle = Levenshtein.normalized_distance(a[5], b[5], valueNameArticleLev) 	# verifica a distancia do artigo
+
+									if levArticle != nil then
+										resArticleLev = levArticle
+									end
 								end
+								resAuthorTri = tri
+								resAuthorTri = 1-resAuthorTri
 							end
 
 							if(a[7] == b[7]) then
@@ -404,24 +389,20 @@ class Disambiguation
 							end
 
 							levArticle = Levenshtein.normalized_distance(a[5], b[5], valueNameArticleLev) 	# verifica a distancia do artigo
+							#Rails.logger.info levArticle
 							if levArticle != nil then
 								resArticleLev = levArticle
 							end
 
-							pondNameAuthor = valueNameAuthor/2.0
-							resAuthorTri = pondNameAuthor*resAuthorTri
-							#Rails.logger.info "Trigram #{resAuthorTri}"
-							#Rails.logger.info "Lev ANTES #{resAuthorLev}"
-							resAuthorLev = pondNameAuthor*resAuthorLev
-							#Rails.logger.info "Lev #{resAuthorLev}"
-
-							resArticleLev = valueNameArticle*valueNameArticleLev
+							#Rails.logger.info resArticleLev
+							resAuthorTri = valueNameAuthor*resAuthorTri
+							resArticleLev2 = valueNameArticle*resArticleLev
 
 							#Rails.logger.info "formula ==> nomeArtigo: #{valueNameArticle} #{levArticle} noeCOnferencia: #{valueNameConference} #{levConf} nameAuthor: #{valueNameAuthor} #{levAuthor} year: #{vYear} rank: #{vRank} "
 							#same[2] = ( ((valueNameArticle-levArticle)**2) + ((valueNameConference-levConf)**2) + vYear + ((valueNameAuthor-levAuthor)**2) + vRank)
 							#Rails.logger.info "#{a[3]} <==> #{b[3]}"
 							#Rails.logger.info "Formula: ( #{valueNameAuthor} - #{resAuthorLev} - #{resAuthorTri}  ) + #{resRank} + ( #{valueNameArticle} - #{resArticleLev} ) + #{resYear}"
-							same[2] = ((valueNameAuthor - resAuthorLev) - resAuthorTri) + resRank + (valueNameArticle - resArticleLev) + resYear
+							same[2] = (valueNameAuthor - resAuthorTri) + resRank + (valueNameArticle - resArticleLev2) + resYear
 							#Rails.logger.info "#{same[2]}"
 							sames.push(same)
 							indexes.push(tempIndex1)
@@ -451,9 +432,10 @@ class Disambiguation
 	def createTriples (entitiesSames, nameGraph)
 		graph = RDF::Graph.new
 		ufpel = RDF::Vocabulary.new("http://ufpel.edu.br/")
-		disambiguation = RDF::Vocabulary.new("http://vivoext.org/")
+		disambiguation = RDF::Vocabulary.new("http://glaucomunsberg.com/onto/vivoext/")
 		cont = 0
 		triples = []
+
 
 		entitiesSames.each do | entity |
 			#Rails.logger.info entity
@@ -463,24 +445,22 @@ class Disambiguation
 					temp = RDF::Graph.new
 
 					id = "%06d" % cont
-					graph << [disambiguation.pair+"#has_dis-"+id, RDF.type, disambiguation.pair]
-					graph << [disambiguation.pair+"#has_dis-"+id, RDF.type, RDF::OWL.NamedIndividual]
-					graph << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
-					graph << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[2]]
-					graph << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					#graph << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
-					graph << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					#graph << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
+
+					graph << [disambiguation.Pair+id.to_s, RDF.type, disambiguation.Pair]
+					graph << [disambiguation.Pair+id.to_s, RDF.type, RDF::OWL.NamedIndividual]
+					graph << [disambiguation.Pair+id.to_s, RDF::RDFS.label, id.to_s+"@pt"]
+					graph << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#hasRelation", ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", "")]
+					graph << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#hasRelation", ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", "")]
+					graph << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#value_disambiguation", same[2]]
 
 
-					temp << [disambiguation.pair+"#has_dis-"+id, RDF.type, disambiguation.pair]
-					temp << [disambiguation.pair+"#has_dis-"+id, RDF.type, RDF::OWL.NamedIndividual]
-					temp << [disambiguation.pair+"#has_dis-"+id, RDF::RDFS.label, id.to_s+"@pt"]
-					temp << [disambiguation.pair+"#has_dis-"+id, disambiguation.pair+"#value_disambiguation", same[2]]
-					temp << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					#temp << [ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[0][3]]
-					temp << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), disambiguation.pair+"#has_dis", disambiguation.pair+"#has_dis-"+id]
-					#temp << [ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", ""), RDF::RDFS.label, same[1][3]]
+					temp << [disambiguation.Pair+id.to_s, RDF.type, disambiguation.Pair]
+					temp << [disambiguation.Pair+id.to_s, RDF.type, RDF::OWL.NamedIndividual]
+					temp << [disambiguation.Pair+id.to_s, RDF::RDFS.label, id.to_s+"@pt"]
+					temp << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#hasRelation", ufpel.lattes+same[0][2].gsub("http://ufpel.edu.br/lattes", "")]
+					temp << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#hasRelation", ufpel.lattes+same[1][2].gsub("http://ufpel.edu.br/lattes", "")]
+					temp << [disambiguation.Pair+id.to_s, disambiguation.Pair+"#value_disambiguation", same[2]]
+
 
 				triples[cont] = temp.dump(:ntriples)
 				cont = cont+1
